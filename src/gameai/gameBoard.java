@@ -14,28 +14,24 @@ import java.util.logging.Logger;
  *
  * @author SHAANAN
  */
- 
- 
- // TODO: Change to 2 bit system
- // Add counter for total number of jump states reachable
- // Getter function for jump states to generate on demand
- // Add function to get all one-jumps using checkJumpsfromSpace()
- // In getMoves() get all one-jumps and for all of those get number of childjumps
- // (Base case is when there are no more one-jumps from a given board)
- // Change bad constants and turnBool, and turn
- // Change executeMove to take in a list of moves to make
- // Add counter for moves
- 
+// TODO: Change to 2 bit system
+// Add counter for total number of jump states reachable
+// Getter function for jump states to generate on demand
+// Add function to get all one-jumps using checkJumpsfromSpace()
+// In getMoves() get all one-jumps and for all of those get number of childjumps
+// (Base case is when there are no more one-jumps from a given board)
+// Change bad constants and turnBool, and turn
+// Change executeMove to take in a list of moves to make
+// Add counter for moves
 public class gameBoard implements Cloneable {
 
-    private static final int EMPTY = -1;
-    private static final int WHITE = 1;
-    private static final int BLACK = 0;
-    private int turn = WHITE;
+    private static final boolean WHITE = true;
+    private static final boolean BLACK = false;
+    boolean turn = WHITE;
+
     int[] dirs;
     BitSet pieces;
     BitSet mask;
-    BitSet dead;
     int size;
     int n;
 
@@ -44,12 +40,14 @@ public class gameBoard implements Cloneable {
 
         pieces = new BitSet();
         mask = new BitSet();
-        dead = new BitSet();
         this.n = n;
         size = n * n;
     }
 
-    public gameBoard executeMove(int x, int y) {
+    public gameBoard executeMove(Move move) {
+
+        int x = move.x;
+        int y = move.y;
 
         gameBoard gb = null;
         try {
@@ -63,72 +61,38 @@ public class gameBoard implements Cloneable {
 
 
         /* If the space is already taken, the move is invalid */
-        if (gb.mask.get(num) || gb.dead.get(num)) {
+        if (gb.mask.get(num)) {
             throw new IllegalArgumentException();
         }
+
 
         gb.mask.set(num);
 
         /* implementing simple placement */
-        boolean turnBool = false;
         if (turn == WHITE) {
             gb.pieces.set(num);
-            turnBool = true;
         }
 
-        // Replace with doing moves from the list
-        List<Integer> jumps = checkMove(x, y);
-        if (jumps != null) {
-            for (Integer i : jumps) {
-                if (gb.pieces.get(num + dirs[i]) != turnBool) {
-                    gb.dead.set(num + dirs[i]);
-                }
-            }
-            
-            //TODO: Check for compound jumps here, by checking around
-
+        if (!move.jump) {
+            gb.turn = !turn;
         }
-
-        /* switch turns */
-        gb.turn = 1 - turn;
 
         /* TODO IMPLEMENT JUMP LOGIC */
         return gb;
     }
 
-    public int getSpace(int x, int y) {
-        int num = y * n + x;
-
-        /* if the piece is not set */
-        if (mask.get(num)) {
-            return EMPTY;
-            /* if the piece is set and is WHITE */
-        } else if (pieces.get(num)) {
-            return WHITE;
-            /* if the piece is set and is BLACK */
-        } else {
-            return BLACK;
-        }
-    }
-
     /* TODO: Is it best to return an integer list? 
      * Is this the best algorithm to get moves? */
     /* O(size) */
-    public List<Move> getMoves() {
+    public List<Move> getPlaceMoves() {
         List<Move> moves = new ArrayList();
-        /* Add a cache of boards */
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
                 int num = y * n + x;
-                if (!mask.get(num) || !dead.get(num)) {
+                if (!mask.get(num)) {
                     Move m = new Move();
                     m.x = x;
                     m.y = y;
-                    m.jumps = checkMove(x, y);
-                    /* For all jumps, generate successor board */
-                    /* Check if board already exists in the cache */
-                    /* Check surrounding squares in the successor board *
-                    /* Add functions - getplacemoves() getjumpmoves() */
                     moves.add(m);
                 }
             }
@@ -136,37 +100,83 @@ public class gameBoard implements Cloneable {
         return moves;
     }
 
+    public List<Move> getJumpMoves() {
+        List<Move> moves = new ArrayList();
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < n; x++) {
+                int num = y * n + x;
+
+                /* If the space is populated by your color and is a jump */
+                if (mask.get(num) && (pieces.get(num) == turn)) {
+
+                    List<Move> jumps = getSpaceJumps(x, y);
+                    for (Move jump : jumps) {
+
+                        Move m = new Move(jump.x, jump.y, true);
+                        moves.add(m);
+                        gameBoard gb = executeMove(m);
+                        System.out.println("Tree Board");
+                        System.out.println(gb);
+                        moves.addAll(gb.getSpaceJumps(m.x,m.y));
+                    }
+                }
+
+            }
+        }
+        return moves;
+    }
+
+    public List<Move> jumpDFS() {
+        /* Base case, return no jumps */
+        /* If the move is a jump, call DFS on it */
+        /* For all jumps, generate successor board */
+        /* Check if board already exists in the cache */
+        /* Check surrounding squares in the successor board *
+         /* Add functions - getplacemoves() getjumpmoves() */
+
+        return null;
+    }
+
     /* TODO Consider caching results to minimize lookups? */
     /* TODO Add check for illegal move */
     /* TODO write spec - returns direction index, or -1 on move */
     /* TODO: change function to check from a full space rather than an empty */
-    private List<Integer> checkMove(int x, int y) {
+    /* Returns the direction of all squares that would be jumped by a move */
+    private List<Move> getSpaceJumps(int x, int y) {
         int num = y * n + x;
 
-        boolean turnBool = false;
-        if (turn == WHITE) {
-            turnBool = true;
-        }
-
-        List<Integer> jumps = null;
+        List<Move> moves = new ArrayList();
 
         for (int i = 0; i < 9; i++) {
             try {
-
-                if (mask.get(num + dirs[i])
-                        && mask.get(num + dirs[i] * 2)
-                        && pieces.get(num + dirs[i] * 2) == turnBool) {
-                    if (jumps == null) {
-                        jumps = new ArrayList();
-                    }
-                    jumps.add(i);
+                int candidateSpace = num + dirs[i] * 2;
+                // past edge of line
+                if(candidateSpace < 0
+                        || ((x+dirs[i] < n) && (x+dirs[i]*2 >= n)) ||
+                            ((x+dirs[i] >= 0) && (x+dirs[i]*2 < 0))
+                        ){continue;}
+                // If on left edge
+                
+                if( (x == 0) && 
+                        ((i == 1) || (i == 8) || (i == 5))
+                        ){
+                    continue;
+                } else if ( (x == n-1) && 
+                        ((i == 0) || (i == 6) || (i == 4))
+                    ) {
+                    continue;
+                }
+                
+                
+                if (mask.get(num + dirs[i]) && !mask.get(candidateSpace)) {
+                    Move m = new Move(candidateSpace % n, candidateSpace / n, true);
+                    moves.add(m);
                 }
             } catch (IndexOutOfBoundsException e) {
             }
         }
 
-
-        return jumps;
+        return moves;
     }
 
     /* O(size) printing of the board */
@@ -175,15 +185,17 @@ public class gameBoard implements Cloneable {
         String str = "";
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
+
                 int num = y * n + x;
-                if (dead.get(num)) {
-                    str = str + "X";
-                } else if (mask.get(num)) {
+
+                if (mask.get(num)) {
                     if (pieces.get(num)) {
                         str = str + "W";
                     } else {
                         str = str + "B";
                     }
+                } else if (pieces.get(num)) {
+                    str = str + "X";
                 } else {
                     str = str + ".";
                 }
@@ -195,17 +207,14 @@ public class gameBoard implements Cloneable {
     }
 
     public static void main(String[] args) {
-        gameBoard gb = new gameBoard(5);
-        gb = gb.executeMove(0, 0);
-        gb = gb.executeMove(1, 0);
-        
-        
-        gb = gb.executeMove(4, 0);
-        gb = gb.executeMove(3, 0);
-        
-        gb = gb.executeMove(2, 1);
+        gameBoard gb = new gameBoard(4);
+        gb = gb.executeMove(new Move(1,1));
+        gb = gb.executeMove(new Move(2,1));
+        gb = gb.executeMove(new Move(1,2));
+        //gb = gb.executeMove(new Move(2,1));
         System.out.println(gb);
-        List<Move> moves = gb.getMoves();
+        //List<Move> jumps = gb.getSpaceJumps(2, 1);
+        List<Move> moves = gb.getJumpMoves();
         int a = 1;
     }
 }

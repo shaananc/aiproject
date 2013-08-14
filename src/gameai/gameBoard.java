@@ -14,6 +14,18 @@ import java.util.logging.Logger;
  *
  * @author SHAANAN
  */
+ 
+ 
+ // TODO: Change to 2 bit system
+ // Add counter for total number of jump states reachable
+ // Getter function for jump states to generate on demand
+ // Add function to get all one-jumps using checkJumpsfromSpace()
+ // In getMoves() get all one-jumps and for all of those get number of childjumps
+ // (Base case is when there are no more one-jumps from a given board)
+ // Change bad constants and turnBool, and turn
+ // Change executeMove to take in a list of moves to make
+ // Add counter for moves
+ 
 public class gameBoard implements Cloneable {
 
     private static final int EMPTY = -1;
@@ -64,7 +76,7 @@ public class gameBoard implements Cloneable {
             turnBool = true;
         }
 
-
+        // Replace with doing moves from the list
         List<Integer> jumps = checkMove(x, y);
         if (jumps != null) {
             for (Integer i : jumps) {
@@ -104,6 +116,7 @@ public class gameBoard implements Cloneable {
     /* O(size) */
     public List<Move> getMoves() {
         List<Move> moves = new ArrayList();
+        /* Add a cache of boards */
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
                 int num = y * n + x;
@@ -112,6 +125,10 @@ public class gameBoard implements Cloneable {
                     m.x = x;
                     m.y = y;
                     m.jumps = checkMove(x, y);
+                    /* For all jumps, generate successor board */
+                    /* Check if board already exists in the cache */
+                    /* Check surrounding squares in the successor board *
+                    /* Add functions - getplacemoves() getjumpmoves() */
                     moves.add(m);
                 }
             }
@@ -122,6 +139,7 @@ public class gameBoard implements Cloneable {
     /* TODO Consider caching results to minimize lookups? */
     /* TODO Add check for illegal move */
     /* TODO write spec - returns direction index, or -1 on move */
+    /* TODO: change function to check from a full space rather than an empty */
     private List<Integer> checkMove(int x, int y) {
         int num = y * n + x;
 

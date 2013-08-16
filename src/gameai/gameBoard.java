@@ -52,7 +52,7 @@ public class gameBoard {
         int y = move.y;
 
         gameBoard gb = (gameBoard) this.deepCopy();
-      
+
 
         int num = y * n + x;
 
@@ -129,10 +129,10 @@ public class gameBoard {
     }
 
     public void jumpDFS(List<Move> moves, gameBoard gb) {
-        System.out.println("jdfs");
+        //System.out.println("jdfs");
 
         for (Move move : moves) {
-            
+
             gameBoard gb_prime = gb.executeMove(move);
             //System.out.println(gb_prime);
             //System.out.println(gb);
@@ -141,7 +141,7 @@ public class gameBoard {
             jumpDFS(move.compJumps, gb_prime);
             //move.compJumps.addAll(r);
         }
-        System.out.println("end jdfs");
+        //System.out.println("end jdfs");
 
         /* Base case, return no jumps */
         /* If the move is a jump, call DFS on it */
@@ -220,12 +220,12 @@ public class gameBoard {
         return str;
 
     }
-    
-    public gameBoard deepCopy(){
+
+    public gameBoard deepCopy() {
         gameBoard gb = new gameBoard(this.n);
         gb.turn = turn;
-        gb.mask = (BitSet)mask.clone();
-        gb.pieces = (BitSet)pieces.clone();
+        gb.mask = (BitSet) mask.clone();
+        gb.pieces = (BitSet) pieces.clone();
         return gb;
     }
 
@@ -234,12 +234,22 @@ public class gameBoard {
         gb = gb.executeMove(new Move(1, 1));
         gb = gb.executeMove(new Move(2, 1));
         gb = gb.executeMove(new Move(1, 2));
-        //gb = gb.executeMove(new Move(3, 3));
-        //gb = gb.executeMove(new Move(0, 2));
+        gb = gb.executeMove(new Move(3, 3));
+        gb = gb.executeMove(new Move(0, 2));
         //gb = gb.executeMove(new Move(2,1));
         System.out.println(gb);
         //List<Move> jumps = gb.getSpaceJumps(2, 1);
         List<Move> moves = gb.getJumpMoves();
+        Queue<Move> toplay = new LinkedList();
+        toplay.add(moves.get(0));
+        while (!toplay.isEmpty()) {
+            Move m = toplay.remove();
+            gb = gb.executeMove(m);
+            if (!m.compJumps.isEmpty()) {
+                toplay.add(m.compJumps.get(0));
+            }
+            System.out.println(gb);
+        }
         int a = 1;
     }
 }

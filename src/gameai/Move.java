@@ -4,6 +4,7 @@
  */
 package gameai;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -23,8 +24,11 @@ public class Move {
         this.x = x;
         this.y = y;
         this.jump = jump;
+        this.compJumps = new LinkedList();
     }
     
     int x,y;
     boolean jump;
+    int jumpedSquare;
+    List<Move> compJumps;
 }

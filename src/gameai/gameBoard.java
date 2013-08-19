@@ -4,6 +4,7 @@
  */
 package gameai;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -11,6 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -30,8 +33,6 @@ public class gameBoard {
 
     protected static final boolean WHITE = true;
     protected static final boolean BLACK = false;
-    
-    
     boolean turn = WHITE;
     int[] dirs;
     BitSet pieces;
@@ -88,34 +89,35 @@ public class gameBoard {
     public boolean isDead(int loc) {
         return (pieces.get(loc) && !mask.get(loc));
     }
-    
-    public boolean isMyPiece(int loc){
+
+    public boolean isMyPiece(int loc) {
         return (mask.get(loc) && (pieces.get(loc) == turn));
     }
-    
-    public boolean isFull(int loc){
+
+    public boolean isFull(int loc) {
         return mask.get(loc);
     }
 
-    public void setWhite(int loc){
+    public void setWhite(int loc) {
         pieces.set(loc);
         mask.set(loc);
     }
-    
-    public void setBlack(int loc){
+
+    public void setBlack(int loc) {
         pieces.clear(loc);
         mask.set(loc);
     }
-    
-    public void setEmpty(int loc){
+
+    public void setEmpty(int loc) {
         pieces.clear(loc);
         mask.clear(loc);
     }
-    
-    public void setDead(int loc){
+
+    public void setDead(int loc) {
         pieces.set(loc);
         mask.clear(loc);
     }
+
     public gameBoard executeMove(Move move) {
 
         int x = move.x;
@@ -141,13 +143,13 @@ public class gameBoard {
             gb.setBlack(num);
         }
 
-        if (move.jumpedSquare != Move.PLACE) {
+        if (move.jumpedSquare == Move.PLACE) {
 
             gb.turn = !turn;
 
         } else if (move.jumpedSquare != -1) {
 
-            gb.setDead(y*n+x);
+            gb.setDead(move.jumpedSquare);
         }
 
         return gb;
@@ -157,7 +159,7 @@ public class gameBoard {
      * Is this the best algorithm to get moves? */
     /* O(size) */
     public List<Move> getPlaceMoves() {
-        List<Move> moves = new ArrayList();
+        List<Move> moves = new ArrayList<>();
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
                 int num = y * n + x;
@@ -173,8 +175,8 @@ public class gameBoard {
     }
 
     public List<Move> getJumpMoves() {
-        List<Move> moves = new ArrayList();
-        
+        List<Move> moves = new ArrayList<>();
+
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
                 int num = y * n + x;
@@ -182,28 +184,58 @@ public class gameBoard {
                 /* If the space is populated by your color and is a jump */
                 if (mask.get(num) && (pieces.get(num) == turn)) {
 
-                    moves.addAll(getSpaceJumps(x, y));
+                    for (Move move : getSpaceJumps(x, y)) {
+                        jumpDFS(move, this);
+                        moves.add(move);
+                    }
 
                 }
 
             }
         }
-        jumpDFS(moves, this);
+
 
         return moves;
     }
 
-    public int jumpDFS(List<Move> moves, gameBoard gb) {
-        
+    public int countJumpMoves() {
         int count = 0;
-        for (Move move : moves) {
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < n; x++) {
+                if (isMyPiece(y * n + x)) {
 
-            gameBoard gb_prime = gb.executeMove(move);
-            List<Move> jumps = gb_prime.getSpaceJumps(move.x, move.y);
-            move.compJumps.addAll(jumps);
-            jumpDFS(move.compJumps, gb_prime);
+                    if (x == 0 && y == 0) {
+                        int debug = 1;
+                    }
+
+                    for (Move move : getSpaceJumps(x, y)) {
+                        count += 1;
+                        count += jumpDFS(move, this);
+                    }
+
+                }
+
+            }
         }
-        return 1;
+        return count;
+
+    }
+
+    public int jumpDFS(Move move, gameBoard gb) {
+
+        int count = 0;
+
+
+        gameBoard gb_prime = gb.executeMove(move);
+        //System.out.println("gb'\n" + gb_prime);
+        for (Move move_prime : gb_prime.getSpaceJumps(move.x, move.y)) {
+            move.compJumps.add(move_prime);
+            count += 1;
+            count += jumpDFS(move_prime, gb_prime);
+        }
+
+
+        return count;
 
         /* Base case, return no jumps */
         /* If the move is a jump, call DFS on it */
@@ -221,14 +253,18 @@ public class gameBoard {
     private List<Move> getSpaceJumps(int x, int y) {
         int num = y * n + x;
 
-        List<Move> moves = new ArrayList();
+        List<Move> moves = new ArrayList<>();
 
         for (int i = 0; i < 9; i++) {
             try {
-                
+
                 int candidateSpace = num + dirs[i] * 2;
                 int jumpedSquare = num + dirs[i];
-                
+
+                if (candidateSpace > n * n - 1) {
+                    continue;
+                }
+
                 // past edge of line
                 if (candidateSpace < 0
                         || ((x + dirs[i] < n) && (x + dirs[i] * 2 >= n))
@@ -238,7 +274,7 @@ public class gameBoard {
                 // If on left edge
 
                 if ((x == 0)
-                        && ((i == 1) || (i == 8) || (i == 5))) {
+                        && ((i == 1) || (i == 7) || (i == 5))) {
                     continue;
                 } else if ((x == n - 1)
                         && ((i == 0) || (i == 6) || (i == 4))) {
@@ -247,13 +283,13 @@ public class gameBoard {
 
 
                 if (isFull(jumpedSquare) && isEmpty(candidateSpace)) {
-                    int movesJump; 
-                    if (pieces.get(num + dirs[i]) != turn) {
+                    int movesJump;
+                    if (!isMyPiece(jumpedSquare)) {
                         movesJump = jumpedSquare;
                     } else {
                         movesJump = Move.SELF_JUMP;
                     }
-                    
+
                     moves.add(new Move(candidateSpace % n, candidateSpace / n, movesJump));
                 }
             } catch (IndexOutOfBoundsException e) {
@@ -299,7 +335,7 @@ public class gameBoard {
     }
 
     public void printMoves(Collection<Move> moves) {
-        Queue<Move> toplay = new LinkedList();
+        Queue<Move> toplay = new LinkedList<>();
         toplay.addAll(moves);
         while (!toplay.isEmpty()) {
             System.out.println(this.executeMove(toplay.remove()));
@@ -308,35 +344,60 @@ public class gameBoard {
     }
 
     public static void main(String[] args) {
-        gameBoard gb = new gameBoard(4);
-        gb = gb.executeMove(new Move(1, 1));
-        gb = gb.executeMove(new Move(2, 1));
-        gb = gb.executeMove(new Move(1, 2));
-        gb = gb.executeMove(new Move(2, 2));
-        //gb = gb.executeMove(new Move(0, 2));
-        //gb = gb.executeMove(new Move(2,1));
+
+        //        gameBoard gb = new gameBoard(4);
+        //        gb = gb.executeMove(new Move(1, 1));
+        //        gb = gb.executeMove(new Move(2, 1));
+        //        gb = gb.executeMove(new Move(1, 2));
+        //        gb = gb.executeMove(new Move(2, 2));
+        //        //gb = gb.executeMove(new Move(0, 2));
+        //        //gb = gb.executeMove(new Move(2,1));
+        //        System.out.println(gb);
+        //        //return;
+        //        //List<Move> jumps = gb.getSpaceJumps(2, 1);
+        //        List<Move> moves = gb.getJumpMoves();
+        //        Queue<Move> toplay = new LinkedList();
+        //
+        //        toplay.addAll(moves);
+        //        while (!toplay.isEmpty()) {
+        //        }
+        //        }
+
+        //        toplay.add(moves.get(0));
+        //        while (!toplay.isEmpty()) {
+        //            Move m = toplay.remove();
+        //            gb = gb.executeMove(m);
+        //            if (!m.compJumps.isEmpty()) {
+        //                toplay.add(m.compJumps.get(0));
+        //            }
+        //            System.out.println(gb);
+        //        }
+
+
+
+        String full = "B W - W - B\n"
+                + "W X W B B W\n"
+                + "X X W B X B\n"
+                + "B X W W X W\n"
+                + "X B B B X X\n"
+                + "B B B X W W\n";
+        gameBoard gb = new gameBoard(6, full);
         System.out.println(gb);
-        //return;
-        //List<Move> jumps = gb.getSpaceJumps(2, 1);
-        List<Move> moves = gb.getJumpMoves();
-        Queue<Move> toplay = new LinkedList();
+        gb.turn = gameBoard.WHITE;
+        List<Move> whiteJumps = gb.getJumpMoves();
+        System.out.println("W " + gb.countJumpMoves());
+        gb.printMoves(whiteJumps);
 
-        toplay.addAll(moves);
-        while (!toplay.isEmpty()) {
-            System.out.println(gb.executeMove(toplay.remove()));
+        try {
+            System.in.read();
+        } catch (IOException ex) {
+            Logger.getLogger(gameBoard.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-//        toplay.add(moves.get(0));
-//        while (!toplay.isEmpty()) {
-//            Move m = toplay.remove();
-//            gb = gb.executeMove(m);
-//            if (!m.compJumps.isEmpty()) {
-//                toplay.add(m.compJumps.get(0));
-//            }
-//            System.out.println(gb);
-//        }
-
-
-        int a = 1;
+        
+        gb.turn = gameBoard.BLACK;
+        List<Move> blackJumps = gb.getJumpMoves();
+        System.out.println("B " + gb.countJumpMoves());
+        gb.printMoves(blackJumps);
+        
     }
 }

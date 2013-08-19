@@ -33,6 +33,6 @@ public class Move {
     public Move(int x, int y, int jumpedSquare) {
         this(x,y);
         this.jumpedSquare = jumpedSquare;
-        this.compJumps = new LinkedList();
+        this.compJumps = new LinkedList<>();
     }
 }

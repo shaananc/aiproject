@@ -17,16 +17,8 @@ import java.util.Scanner;
  *
  * @author SHAANAN
  */
-// TODO: Change to 2 bit system
-// Add counter for total number of jump states reachable
-// Getter function for jump states to generate on demand
-// Add function to get all one-jumps using checkJumpsfromSpace()
-// In getMoves() get all one-jumps and for all of those get number of childjumps
-// (Base case is when there are no more one-jumps from a given board)
-// Change bad constants and turnBool, and turn
-// Change executeMove to take in a list of moves to make
-// Add counter for moves
-// 11 black, 10, white, 00, clear, 01 X
+
+
 public class gameBoard {
 
     protected static final boolean WHITE = true;
@@ -80,6 +72,8 @@ public class gameBoard {
         }
     }
 
+    // 11 black, 10, white, 00, clear, 01 X
+    
     public boolean isWhite(int loc) {
         return (!pieces.get(loc) && mask.get(loc));
     }
@@ -196,10 +190,8 @@ public class gameBoard {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
                 int num = y * n + x;
-
                 /* If the space is populated by your color and is a jump */
                 if (isMyPiece(num)) {
-
                     for (Move move : getSpaceJumps(x, y)) {
                         jumpDFS(move, this);
                         moves.add(move);
@@ -232,7 +224,6 @@ public class gameBoard {
         int count = 0;
 
         gameBoard gb_prime = gb.executeMove(move);
-        //System.out.println("gb'\n" + gb_prime);
         for (Move move_prime : gb_prime.getSpaceJumps(move.x, move.y)) {
             move.compJumps.add(move_prime);
             count += 1;
@@ -244,46 +235,43 @@ public class gameBoard {
 
     private List<Move> getSpaceJumps(int x, int y) {
         int num = y * n + x;
-        
+
         // Right 0, Left 1, Down 2, Up 3, Down-Right 4, Down-Left 5, Up-Right 6, Up-Left, 7
         //{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
         List<Move> moves = new ArrayList<>();
 
         for (int i = 0; i < 8; i++) {
-            try {
 
-                int candidateSpace = num + dirs[i] * 2;
-                int jumpedSquare = num + dirs[i];
+            int candidateSpace = num + dirs[i] * 2;
+            int jumpedSquare = num + dirs[i];
 
-                // Check square on board
-                if (candidateSpace > n * n - 1 || jumpedSquare > n*n-1 
-                        || candidateSpace < 0 || jumpedSquare < 0) {
-                    continue;
-                }
-
-                // Left Out of Bounds
-                if((i == 5 || i == 7 || i == 1) && x-2<0){
-                    continue;
-                }
-                
-                // Right Out of Bounds
-                if((i == 4 || i == 6 || i == 0) && x+2>=n){
-                    continue;
-                }
-                
-
-                if (isFull(jumpedSquare) && isEmpty(candidateSpace)) {
-                    int movesJump;
-                    if (!isMyPiece(jumpedSquare)) {
-                        movesJump = jumpedSquare;
-                    } else {
-                        movesJump = Move.SELF_JUMP;
-                    }
-
-                    moves.add(new Move(candidateSpace % n, candidateSpace / n, movesJump));
-                }
-            } catch (IndexOutOfBoundsException e) {
+            // Check square on board
+            if (candidateSpace > n * n - 1 || jumpedSquare > n * n - 1
+                    || candidateSpace < 0 || jumpedSquare < 0) {
+                continue;
             }
+
+            // Left Out of Bounds
+            if ((i == 5 || i == 7 || i == 1) && x - 2 < 0) {
+                continue;
+            }
+
+            // Right Out of Bounds
+            if ((i == 4 || i == 6 || i == 0) && x + 2 >= n) {
+                continue;
+            }
+
+            if (isFull(jumpedSquare) && isEmpty(candidateSpace)) {
+                int movesJump;
+                if (!isMyPiece(jumpedSquare)) {
+                    movesJump = jumpedSquare;
+                } else {
+                    movesJump = Move.SELF_JUMP;
+                }
+
+                moves.add(new Move(candidateSpace % n, candidateSpace / n, movesJump));
+            }
+
         }
 
         return moves;
@@ -295,22 +283,16 @@ public class gameBoard {
         String str = "";
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
-
-                int num = y * n + x;
-
-                if (mask.get(num)) {
-                    if (pieces.get(num)) {
-                        str = str + "W";
-                    } else {
-                        str = str + "B";
-                    }
-                } else if (pieces.get(num)) {
-                    str = str + "X";
-                } else {
-                    str = str + "-";
-                }
+                
+                int loc = y * n + x;
+                if(isWhite(loc)){str = str + "W";}
+                else if(isBlack(loc)){str = str + "B";}
+                else if(isDead(loc)){str = str + "X";}
+                else if(isBlack(loc)){str = str + "-";}
+                
                 str = str + " ";
             }
+            
             str = str.trim();
             str = str + "\n";
         }
@@ -332,21 +314,17 @@ public class gameBoard {
         while (!toplay.isEmpty()) {
             System.out.println(this.executeMove(toplay.remove()));
         }
-
     }
 
     public static void run(InputStream in) {
-
         gameBoard gb = new gameBoard(in);
         gb.turn = gameBoard.WHITE;
         System.out.println("W " + gb.getPlaceMoves().size() + " " + gb.countJumpMoves());
         gb.turn = gameBoard.BLACK;
         System.out.println("B " + gb.getPlaceMoves().size() + " " + gb.countJumpMoves());
-
     }
 
     public static void main(String[] args) {
         run(System.in);
-
     }
 }

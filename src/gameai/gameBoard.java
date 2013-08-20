@@ -217,25 +217,19 @@ public class gameBoard {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
                 if (isMyPiece(y * n + x)) {
-
-
                     for (Move move : getSpaceJumps(x, y)) {
                         count += 1;
                         count += jumpDFS(move, this);
                     }
-
                 }
-
             }
         }
         return count;
-
     }
 
     public int jumpDFS(Move move, gameBoard gb) {
 
         int count = 0;
-
 
         gameBoard gb_prime = gb.executeMove(move);
         //System.out.println("gb'\n" + gb_prime);
@@ -245,40 +239,40 @@ public class gameBoard {
             count += jumpDFS(move_prime, gb_prime);
         }
 
-
         return count;
-
-        /* Base case, return no jumps */
-        /* If the move is a jump, call DFS on it */
-        /* For all jumps, generate successor board */
-        /* Check if board already exists in the cache */
-        /* Check surrounding squares in the successor board  */
-
     }
 
-    /* TODO Consider caching results to minimize lookups? */
-    /* TODO Add check for illegal move */
-    /* TODO write spec - returns direction index, or -1 on move */
-    /* TODO: change function to check from a full space rather than an empty */
-    /* Returns the direction of all squares that would be jumped by a move */
     private List<Move> getSpaceJumps(int x, int y) {
         int num = y * n + x;
-
+        
+        // Right 0, Left 1, Down 2, Up 3, Down-Right 4, Down-Left 5, Up-Right 6, Up-Left, 7
+        //{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
         List<Move> moves = new ArrayList<>();
 
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 8; i++) {
             try {
 
                 int candidateSpace = num + dirs[i] * 2;
                 int jumpedSquare = num + dirs[i];
 
-                if (candidateSpace > n * n - 1) {
+                // Check square on board
+                if (candidateSpace > n * n - 1 || jumpedSquare > n*n-1 
+                        || candidateSpace < 0 || jumpedSquare < 0) {
                     continue;
                 }
 
+                // Left Out of Bounds
+                if((i == 5 || i == 7) && x-2<0){
+                    continue;
+                }
+                
+                // Right Out of Bounds
+                if((i == 4 || i == 6) && x+2>=n){
+                    continue;
+                }
+                
                 // past edge of line
-                if (candidateSpace < 0
-                        || ((x + dirs[i] < n) && (x + dirs[i] * 2 >= n))
+                if (((x + dirs[i] < n) && (x + dirs[i] * 2 >= n))
                         || ((x + dirs[i] >= 0) && (x + dirs[i] * 2 < 0))) {
                     continue;
                 }

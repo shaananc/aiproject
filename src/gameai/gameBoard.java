@@ -262,30 +262,15 @@ public class gameBoard {
                 }
 
                 // Left Out of Bounds
-                if((i == 5 || i == 7) && x-2<0){
+                if((i == 5 || i == 7 || i == 1) && x-2<0){
                     continue;
                 }
                 
                 // Right Out of Bounds
-                if((i == 4 || i == 6) && x+2>=n){
+                if((i == 4 || i == 6 || i == 0) && x+2>=n){
                     continue;
                 }
                 
-                // past edge of line
-                if (((x + dirs[i] < n) && (x + dirs[i] * 2 >= n))
-                        || ((x + dirs[i] >= 0) && (x + dirs[i] * 2 < 0))) {
-                    continue;
-                }
-                // If on left edge
-
-                if ((x == 0)
-                        && ((i == 1) || (i == 7) || (i == 5))) {
-                    continue;
-                } else if ((x == n - 1)
-                        && ((i == 0) || (i == 6) || (i == 4))) {
-                    continue;
-                }
-
 
                 if (isFull(jumpedSquare) && isEmpty(candidateSpace)) {
                     int movesJump;

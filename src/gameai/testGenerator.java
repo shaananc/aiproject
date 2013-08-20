@@ -41,6 +41,7 @@ public class testGenerator {
             
             gameBoard.run(new ByteArrayInputStream(("6\n"+gb.toString()).getBytes()));
         }
+        System.setOut(stdout);
     }
 
     public static gameBoard generateBoard(int n) {

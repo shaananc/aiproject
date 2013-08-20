@@ -4,7 +4,11 @@
  */
 package gameai;
 
+import java.io.ByteArrayInputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.List;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,39 +21,41 @@ import static org.junit.Assert.*;
 public class gameBoardTest {
 
     public gameBoardTest() {
-        String test = "- - W W W -\n"
+        String test = 
+                 "- - W W W -\n"
                 + "- - W X - -\n"
                 + "- - W - - -\n"
                 + "- - - - - -\n"
                 + "- - - - - -\n"
                 + "B - - - - -\n";
-        gameBoard gb = new gameBoard(6, test);
-        System.out.println(gb);
+        gameBoard gb = new gameBoard(new ByteArrayInputStream(("6\n"+test).getBytes()));
+        assertEquals(test,gb.toString());
+    
     }
 
-    @BeforeClass
-    public static void setUpClass() {
-    }
 
-    @Before
-    public void setUp() {
-    }
 
     @Test
     public void testNumJumps() {
-        String full = "B W - W - B\n"
+        String full = "6\n"
+                + "B W - W - B\n"
                 + "W X W B B W\n"
                 + "X X W B X B\n"
                 + "B X W W X W\n"
                 + "X B B B X X\n"
                 + "B B B X W W\n";
-        gameBoard gb = new gameBoard(6, full);
-        System.out.println(gb);
+        gameBoard gb = new gameBoard(new ByteArrayInputStream(full.getBytes()));
+        
         gb.turn = gameBoard.WHITE;
-        List<Move> whiteJumps = gb.getJumpMoves();
-        System.out.println("W " + whiteJumps.size());
-        gb.printMoves(whiteJumps);
-        //gb.turn = gameBoard.BLACK;
-        //System.out.println("B " + gb.getJumpMoves().size());
+        assertEquals(4,gb.countJumpMoves());
+
+        gb.turn = gameBoard.BLACK;
+        assertEquals(2,gb.countJumpMoves());
+        
+    }
+    
+    @Test
+    public void testNumPlaces(){
+        
     }
 }

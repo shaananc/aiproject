@@ -4,7 +4,7 @@
  */
 package gameai;
 
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -12,8 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -34,7 +32,7 @@ public class gameBoard {
     protected static final boolean WHITE = true;
     protected static final boolean BLACK = false;
     boolean turn = WHITE;
-    int[] dirs;
+    private int[] dirs;
     BitSet pieces;
     BitSet mask;
     int n;
@@ -47,9 +45,15 @@ public class gameBoard {
         this.n = n;
     }
 
-    public gameBoard(int n, String boardString) {
-        this(n);
-        Scanner s = new Scanner(boardString);
+    public gameBoard(InputStream boardStream) {
+        Scanner s = new Scanner(boardStream);
+        n = s.nextInt();
+        dirs = new int[]{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
+
+        pieces = new BitSet();
+        mask = new BitSet();
+
+
         int loc = 0;
         while (s.hasNext()) {
             String t = s.next();
@@ -66,6 +70,8 @@ public class gameBoard {
                 case "X":
                     pieces.set(loc);
                     break;
+                case "EOF":
+                    return;
                 default:
                     System.out.println("Error parsing boardString -- unidentified char:" + t);
                     System.exit(0);
@@ -163,7 +169,7 @@ public class gameBoard {
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
                 int num = y * n + x;
-                if (!mask.get(num)) {
+                if (isEmpty(num)) {
                     Move m = new Move();
                     m.x = x;
                     m.y = y;
@@ -174,6 +180,16 @@ public class gameBoard {
         return moves;
     }
 
+    public int countPlaceMoves() {
+        int count = 0;
+        for (int loc = 0; loc < n; loc += 1) {
+            if (isEmpty(loc)) {
+                count += 1;
+            }
+        }
+        return count;
+    }
+
     public List<Move> getJumpMoves() {
         List<Move> moves = new ArrayList<>();
 
@@ -182,15 +198,13 @@ public class gameBoard {
                 int num = y * n + x;
 
                 /* If the space is populated by your color and is a jump */
-                if (mask.get(num) && (pieces.get(num) == turn)) {
+                if (isMyPiece(num)) {
 
                     for (Move move : getSpaceJumps(x, y)) {
                         jumpDFS(move, this);
                         moves.add(move);
                     }
-
                 }
-
             }
         }
 
@@ -204,9 +218,6 @@ public class gameBoard {
             for (int x = 0; x < n; x++) {
                 if (isMyPiece(y * n + x)) {
 
-                    if (x == 0 && y == 0) {
-                        int debug = 1;
-                    }
 
                     for (Move move : getSpaceJumps(x, y)) {
                         count += 1;
@@ -317,9 +328,11 @@ public class gameBoard {
                 } else if (pieces.get(num)) {
                     str = str + "X";
                 } else {
-                    str = str + ".";
+                    str = str + "-";
                 }
+                str = str + " ";
             }
+            str = str.trim();
             str = str + "\n";
         }
         return str;
@@ -343,61 +356,18 @@ public class gameBoard {
 
     }
 
-    public static void main(String[] args) {
+    public static void run(InputStream in) {
 
-        //        gameBoard gb = new gameBoard(4);
-        //        gb = gb.executeMove(new Move(1, 1));
-        //        gb = gb.executeMove(new Move(2, 1));
-        //        gb = gb.executeMove(new Move(1, 2));
-        //        gb = gb.executeMove(new Move(2, 2));
-        //        //gb = gb.executeMove(new Move(0, 2));
-        //        //gb = gb.executeMove(new Move(2,1));
-        //        System.out.println(gb);
-        //        //return;
-        //        //List<Move> jumps = gb.getSpaceJumps(2, 1);
-        //        List<Move> moves = gb.getJumpMoves();
-        //        Queue<Move> toplay = new LinkedList();
-        //
-        //        toplay.addAll(moves);
-        //        while (!toplay.isEmpty()) {
-        //        }
-        //        }
-
-        //        toplay.add(moves.get(0));
-        //        while (!toplay.isEmpty()) {
-        //            Move m = toplay.remove();
-        //            gb = gb.executeMove(m);
-        //            if (!m.compJumps.isEmpty()) {
-        //                toplay.add(m.compJumps.get(0));
-        //            }
-        //            System.out.println(gb);
-        //        }
-
-
-
-        String full = "B W - W - B\n"
-                + "W X W B B W\n"
-                + "X X W B X B\n"
-                + "B X W W X W\n"
-                + "X B B B X X\n"
-                + "B B B X W W\n";
-        gameBoard gb = new gameBoard(6, full);
-        System.out.println(gb);
+        gameBoard gb = new gameBoard(in);
         gb.turn = gameBoard.WHITE;
-        List<Move> whiteJumps = gb.getJumpMoves();
-        System.out.println("W " + gb.countJumpMoves());
-        gb.printMoves(whiteJumps);
-
-        try {
-            System.in.read();
-        } catch (IOException ex) {
-            Logger.getLogger(gameBoard.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+        System.out.println("W " + gb.getPlaceMoves().size() + " " + gb.countJumpMoves());
         gb.turn = gameBoard.BLACK;
-        List<Move> blackJumps = gb.getJumpMoves();
-        System.out.println("B " + gb.countJumpMoves());
-        gb.printMoves(blackJumps);
-        
+        System.out.println("B " + gb.getPlaceMoves().size() + " " + gb.countJumpMoves());
+
+    }
+
+    public static void main(String[] args) {
+        run(System.in);
+
     }
 }

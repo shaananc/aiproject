@@ -4,35 +4,29 @@
  */
 package gameai;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Queue;
+import java.util.Scanner;
 
 /**
  *
  * @author SHAANAN
  */
-// TODO: Change to 2 bit system
-// Add counter for total number of jump states reachable
-// Getter function for jump states to generate on demand
-// Add function to get all one-jumps using checkJumpsfromSpace()
-// In getMoves() get all one-jumps and for all of those get number of childjumps
-// (Base case is when there are no more one-jumps from a given board)
-// Change bad constants and turnBool, and turn
-// Change executeMove to take in a list of moves to make
-// Add counter for moves
-public class gameBoard implements Cloneable {
 
-    private static final boolean WHITE = true;
-    private static final boolean BLACK = false;
+
+public class gameBoard {
+
+    protected static final boolean WHITE = true;
+    protected static final boolean BLACK = false;
     boolean turn = WHITE;
-
-    int[] dirs;
+    private int[] dirs;
     BitSet pieces;
     BitSet mask;
-    int size;
     int n;
 
     public gameBoard(int n) {
@@ -41,7 +35,87 @@ public class gameBoard implements Cloneable {
         pieces = new BitSet();
         mask = new BitSet();
         this.n = n;
-        size = n * n;
+    }
+
+    public gameBoard(InputStream boardStream) {
+        Scanner s = new Scanner(boardStream);
+        n = s.nextInt();
+        dirs = new int[]{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
+
+        pieces = new BitSet();
+        mask = new BitSet();
+
+
+        int loc = 0;
+        while (s.hasNext()) {
+            String t = s.next();
+            switch (t) {
+                case "-":
+                    break;
+                case "B":
+                    mask.set(loc);
+                    break;
+                case "W":
+                    mask.set(loc);
+                    pieces.set(loc);
+                    break;
+                case "X":
+                    pieces.set(loc);
+                    break;
+                case "EOF":
+                    return;
+                default:
+                    System.out.println("Error parsing boardString -- unidentified char:" + t);
+                    System.exit(0);
+            }
+            loc += 1;
+        }
+    }
+
+    // 11 black, 10, white, 00, clear, 01 X
+    
+    public boolean isWhite(int loc) {
+        return (!pieces.get(loc) && mask.get(loc));
+    }
+
+    public boolean isBlack(int loc) {
+        return (pieces.get(loc) && mask.get(loc));
+    }
+
+    public boolean isEmpty(int loc) {
+        return (!pieces.get(loc) && !mask.get(loc));
+    }
+
+    public boolean isDead(int loc) {
+        return (pieces.get(loc) && !mask.get(loc));
+    }
+
+    public boolean isMyPiece(int loc) {
+        return (mask.get(loc) && (pieces.get(loc) == turn));
+    }
+
+    public boolean isFull(int loc) {
+        return mask.get(loc);
+    }
+
+    public void setWhite(int loc) {
+        pieces.set(loc);
+        mask.set(loc);
+    }
+
+    public void setBlack(int loc) {
+        pieces.clear(loc);
+        mask.set(loc);
+    }
+
+    public void setEmpty(int loc) {
+        pieces.clear(loc);
+        mask.clear(loc);
+    }
+
+    public void setDead(int loc) {
+        pieces.set(loc);
+        mask.clear(loc);
     }
 
     public gameBoard executeMove(Move move) {
@@ -49,13 +123,8 @@ public class gameBoard implements Cloneable {
         int x = move.x;
         int y = move.y;
 
-        gameBoard gb = null;
-        try {
-            gb = (gameBoard) this.clone();
-        } catch (CloneNotSupportedException ex) {
-            Logger.getLogger(gameBoard.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
+        gameBoard gb = (gameBoard) this.deepCopy();
+
 
         int num = y * n + x;
 
@@ -66,18 +135,23 @@ public class gameBoard implements Cloneable {
         }
 
 
-        gb.mask.set(num);
-
         /* implementing simple placement */
+
         if (turn == WHITE) {
-            gb.pieces.set(num);
+            gb.setWhite(num);
+        } else {
+            gb.setBlack(num);
         }
 
-        if (!move.jump) {
+        if (move.jumpedSquare == Move.PLACE) {
+
             gb.turn = !turn;
+
+        } else if (move.jumpedSquare != -1) {
+
+            gb.setDead(move.jumpedSquare);
         }
 
-        /* TODO IMPLEMENT JUMP LOGIC */
         return gb;
     }
 
@@ -85,11 +159,11 @@ public class gameBoard implements Cloneable {
      * Is this the best algorithm to get moves? */
     /* O(size) */
     public List<Move> getPlaceMoves() {
-        List<Move> moves = new ArrayList();
+        List<Move> moves = new ArrayList<>();
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
                 int num = y * n + x;
-                if (!mask.get(num)) {
+                if (isEmpty(num)) {
                     Move m = new Move();
                     m.x = x;
                     m.y = y;
@@ -100,80 +174,104 @@ public class gameBoard implements Cloneable {
         return moves;
     }
 
+    public int countPlaceMoves() {
+        int count = 0;
+        for (int loc = 0; loc < n; loc += 1) {
+            if (isEmpty(loc)) {
+                count += 1;
+            }
+        }
+        return count;
+    }
+
     public List<Move> getJumpMoves() {
-        List<Move> moves = new ArrayList();
+        List<Move> moves = new ArrayList<>();
+
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
                 int num = y * n + x;
-
                 /* If the space is populated by your color and is a jump */
-                if (mask.get(num) && (pieces.get(num) == turn)) {
-
-                    List<Move> jumps = getSpaceJumps(x, y);
-                    for (Move jump : jumps) {
-
-                        Move m = new Move(jump.x, jump.y, true);
-                        moves.add(m);
-                        gameBoard gb = executeMove(m);
-                        System.out.println("Tree Board");
-                        System.out.println(gb);
-                        moves.addAll(gb.getSpaceJumps(m.x,m.y));
+                if (isMyPiece(num)) {
+                    for (Move move : getSpaceJumps(x, y)) {
+                        jumpDFS(move, this);
+                        moves.add(move);
                     }
                 }
-
             }
         }
+
+
         return moves;
     }
 
-    public List<Move> jumpDFS() {
-        /* Base case, return no jumps */
-        /* If the move is a jump, call DFS on it */
-        /* For all jumps, generate successor board */
-        /* Check if board already exists in the cache */
-        /* Check surrounding squares in the successor board *
-         /* Add functions - getplacemoves() getjumpmoves() */
-
-        return null;
+    public int countJumpMoves() {
+        int count = 0;
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < n; x++) {
+                if (isMyPiece(y * n + x)) {
+                    for (Move move : getSpaceJumps(x, y)) {
+                        count += 1;
+                        count += jumpDFS(move, this);
+                    }
+                }
+            }
+        }
+        return count;
     }
 
-    /* TODO Consider caching results to minimize lookups? */
-    /* TODO Add check for illegal move */
-    /* TODO write spec - returns direction index, or -1 on move */
-    /* TODO: change function to check from a full space rather than an empty */
-    /* Returns the direction of all squares that would be jumped by a move */
+    public int jumpDFS(Move move, gameBoard gb) {
+
+        int count = 0;
+
+        gameBoard gb_prime = gb.executeMove(move);
+        for (Move move_prime : gb_prime.getSpaceJumps(move.x, move.y)) {
+            move.compJumps.add(move_prime);
+            count += 1;
+            count += jumpDFS(move_prime, gb_prime);
+        }
+
+        return count;
+    }
+
     private List<Move> getSpaceJumps(int x, int y) {
         int num = y * n + x;
 
-        List<Move> moves = new ArrayList();
+        // Right 0, Left 1, Down 2, Up 3, Down-Right 4, Down-Left 5, Up-Right 6, Up-Left, 7
+        //{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
+        List<Move> moves = new ArrayList<>();
 
-        for (int i = 0; i < 9; i++) {
-            try {
-                int candidateSpace = num + dirs[i] * 2;
-                // past edge of line
-                if(candidateSpace < 0
-                        || ((x+dirs[i] < n) && (x+dirs[i]*2 >= n)) ||
-                            ((x+dirs[i] >= 0) && (x+dirs[i]*2 < 0))
-                        ){continue;}
-                // If on left edge
-                
-                if( (x == 0) && 
-                        ((i == 1) || (i == 8) || (i == 5))
-                        ){
-                    continue;
-                } else if ( (x == n-1) && 
-                        ((i == 0) || (i == 6) || (i == 4))
-                    ) {
-                    continue;
-                }
-                
-                
-                if (mask.get(num + dirs[i]) && !mask.get(candidateSpace)) {
-                    Move m = new Move(candidateSpace % n, candidateSpace / n, true);
-                    moves.add(m);
-                }
-            } catch (IndexOutOfBoundsException e) {
+        for (int i = 0; i < 8; i++) {
+
+            int candidateSpace = num + dirs[i] * 2;
+            int jumpedSquare = num + dirs[i];
+
+            // Check square on board
+            if (candidateSpace > n * n - 1 || jumpedSquare > n * n - 1
+                    || candidateSpace < 0 || jumpedSquare < 0) {
+                continue;
             }
+
+            // Left Out of Bounds
+            if ((i == 5 || i == 7 || i == 1) && x - 2 < 0) {
+                continue;
+            }
+
+            // Right Out of Bounds
+            if ((i == 4 || i == 6 || i == 0) && x + 2 >= n) {
+                continue;
+            }
+
+            if (isFull(jumpedSquare) && isEmpty(candidateSpace)) {
+                int movesJump;
+                if (!isMyPiece(jumpedSquare)) {
+                    movesJump = jumpedSquare;
+                } else {
+                    movesJump = Move.SELF_JUMP;
+                }
+
+                moves.add(new Move(candidateSpace % n, candidateSpace / n, movesJump));
+            }
+
         }
 
         return moves;
@@ -185,36 +283,48 @@ public class gameBoard implements Cloneable {
         String str = "";
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
-
-                int num = y * n + x;
-
-                if (mask.get(num)) {
-                    if (pieces.get(num)) {
-                        str = str + "W";
-                    } else {
-                        str = str + "B";
-                    }
-                } else if (pieces.get(num)) {
-                    str = str + "X";
-                } else {
-                    str = str + ".";
-                }
+                
+                int loc = y * n + x;
+                if(isWhite(loc)){str = str + "W";}
+                else if(isBlack(loc)){str = str + "B";}
+                else if(isDead(loc)){str = str + "X";}
+                else if(isBlack(loc)){str = str + "-";}
+                
+                str = str + " ";
             }
+            
+            str = str.trim();
             str = str + "\n";
         }
         return str;
 
     }
 
+    public gameBoard deepCopy() {
+        gameBoard gb = new gameBoard(this.n);
+        gb.turn = turn;
+        gb.mask = (BitSet) mask.clone();
+        gb.pieces = (BitSet) pieces.clone();
+        return gb;
+    }
+
+    public void printMoves(Collection<Move> moves) {
+        Queue<Move> toplay = new LinkedList<>();
+        toplay.addAll(moves);
+        while (!toplay.isEmpty()) {
+            System.out.println(this.executeMove(toplay.remove()));
+        }
+    }
+
+    public static void run(InputStream in) {
+        gameBoard gb = new gameBoard(in);
+        gb.turn = gameBoard.WHITE;
+        System.out.println("W " + gb.getPlaceMoves().size() + " " + gb.countJumpMoves());
+        gb.turn = gameBoard.BLACK;
+        System.out.println("B " + gb.getPlaceMoves().size() + " " + gb.countJumpMoves());
+    }
+
     public static void main(String[] args) {
-        gameBoard gb = new gameBoard(4);
-        gb = gb.executeMove(new Move(1,1));
-        gb = gb.executeMove(new Move(2,1));
-        gb = gb.executeMove(new Move(1,2));
-        //gb = gb.executeMove(new Move(2,1));
-        System.out.println(gb);
-        //List<Move> jumps = gb.getSpaceJumps(2, 1);
-        List<Move> moves = gb.getJumpMoves();
-        int a = 1;
+        run(System.in);
     }
 }

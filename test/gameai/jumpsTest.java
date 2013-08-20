@@ -8,12 +8,6 @@ package gameai;
  *
  * @author SHAANAN
  */
-public class GameAI {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        
-    }
+public class jumpsTest {
+    
 }

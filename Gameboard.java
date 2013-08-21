@@ -1,11 +1,11 @@
 import java.util.ArrayList;
 
-/* TODO: use more space-efficient method for storing Cell */
 public class Gameboard implements Cloneable {
 
 	private int n;
 	public Cell[] board;
 	
+	// empty board constructor
 	public Gameboard(int n) {
 
 		this.n = n;		// create (n x n) board of empty cells
@@ -17,8 +17,19 @@ public class Gameboard implements Cloneable {
 		}
 	}
 	
+	// copy constructor
+	public Gameboard(Gameboard aGameboard) {
+		this.n = aGameboard.n;
+		this.board = new Cell[n*n];
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				board[i*n + j] = new Cell(aGameboard.board[i*n + j].state);
+			}
+		}
+	}
+	
+	// string-to-board constructor
 	public Gameboard(int n, String boardString) {
-		// TODO
 		this(n);
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
@@ -42,8 +53,16 @@ public class Gameboard implements Cloneable {
 		}
 	}
 	
+	// creates a copy of current gameboard and returns it
+	public static Gameboard newInstance(Gameboard aGameboard) {
+		return new Gameboard(aGameboard);
+	}
+	
+	// returns ArrayList of NeighbourPairs for a given Pos, where a NeighbourPair
+	// consists of 2 Pos's radially adjacent to "pos", where a piece situated on
+	// "pos" could potentially jump over NeighbourPair.neighbour and onto
+	// NeighbourPair.neighboursNeighbour
 	public ArrayList<NeighbourPair> getNeighbourPairs(Pos pos) {
-		// TODO: consider storing 4 bools iPlus2, jPlus2 etc
 		int i = pos.i;
 		int j = pos.j;
 		ArrayList<NeighbourPair> neighbourPairs = new ArrayList<NeighbourPair>();
@@ -91,60 +110,38 @@ public class Gameboard implements Cloneable {
 		return neighbourPairs;
 	}
 	
-	public int getN() {
-		return n;
-	}
-	
-	// place piece of state "player" at position "pos" and return new Gameboard
+	// place "player" piece at position "pos" on new Gameboard and return Gameboard
 	public Gameboard executeMove(Cell.State player, Pos pos) {
-		// TODO: cleanup this code
-		try {
-			Gameboard child = (Gameboard) this.clone();
-			if (player == Cell.State.B) { 
-				child.board[pos.i * n + pos.j].placeBlack();
-			} else {
-				child.board[pos.i * n + pos.j].placeWhite();			
-			}
-			
-			return child;
-			
-		} catch (CloneNotSupportedException e) {
-			System.out.println("Unable to clone Gameboard");
-			System.exit(0);
-			return null;	// to keep the compiler happy
+		Gameboard child = newInstance(this);
+		
+		if (player == Cell.State.B) { 
+			child.board[pos.i * n + pos.j].placeBlack();
+		} else if (player == Cell.State.W) {
+			child.board[pos.i * n + pos.j].placeWhite();			
 		}
+		
+		return child;
 	}
 	
+	// for jump moves - possibly kill cell at position "posKill"
 	public Gameboard executeMove(Cell.State player, Pos pos, Pos posKill) {
-		try {
-			Gameboard child = (Gameboard) this.clone();
-			
-			if (player == Cell.State.B) { 
-				child.board[pos.i * n + pos.j].placeBlack();
-			} else {
-				child.board[pos.i * n + pos.j].placeWhite();			
-			}
-			
-			Cell posKillCell = child.board[posKill.i * n + posKill.j];
-			if (posKillCell.state == Cell.State.B && player == Cell.State.W) {
-				posKillCell.killCell();
-			}
-			
-			if (posKillCell.state == Cell.State.W && player == Cell.State.B) {
-				posKillCell.killCell();
-			}	
-			
-			return child;
-			
-		} catch (CloneNotSupportedException e) {
-			System.out.println("Unable to clone Gameboard");
-			System.exit(0);
-			return null;	// to keep the compiler happy
+		// place player piece at pos
+		Gameboard child = executeMove(player, pos);
+		
+		// kill cell at posKill if it's opposite to player (jumped cell)
+		Cell posKillCell = child.board[posKill.i * n + posKill.j];
+		if (posKillCell.state == Cell.State.B && player == Cell.State.W) {
+			posKillCell.killCell();
 		}
+		
+		if (posKillCell.state == Cell.State.W && player == Cell.State.B) {
+			posKillCell.killCell();
+		}
+		
+		return child;
 	}
 	
 	public String toString() {
-		/* TODO */
 		StringBuffer boardStringBuffer = new StringBuffer( (n+1)*n );	// n+1 for '\n'
 		
 		for (int i = 0; i < n; i++) {

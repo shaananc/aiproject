@@ -1,3 +1,5 @@
+// Gameboard is composed of Cell objects
+// Each cell can be in one of four states
 
 public class Cell {
 	public enum State {E, B, W, X};

@@ -19,8 +19,8 @@ public class NegaScout {
 
         int[] numbers = gb.getNumbers();
 
-        System.out.println(gb);
-        System.out.println(numbers[0] +":"+numbers[1]+"\n");
+        //System.out.println(gb);
+        //System.out.println(numbers[0] +":"+numbers[1]+"\n");
 
         if (gb.turn != gameBoard.WHITE) {
             return numbers[0] - numbers[1];
@@ -69,12 +69,11 @@ public class NegaScout {
         
         gameBoard gb = new gameBoard(new ByteArrayInputStream((boardString.toString()).getBytes()));
         System.out.println(gb);
-        List<List <Move>> moves = gb.getJumpMoves();
+        List<List <Move>> moves = gb.getMoves();
         for (List<Move> m : moves) {
             gameBoard c = gb.deepCopy();
             System.out.println(c.executeCompound(m));
             System.out.println(ns.negascout(c, m, Integer.MIN_VALUE, Integer.MAX_VALUE,1));
-            break;
         }
 
     }

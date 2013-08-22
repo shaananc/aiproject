@@ -16,19 +16,15 @@ public class Move  {
     protected static final int PLACE = -2;
     int x, y;
     int jumpedSquare;
-    Move child;
 
     public Move() {
         this.jumpedSquare = PLACE;
-        child = null;
     }
 
     public Move(int x, int y) {
         this.x = x;
         this.y = y;
         this.jumpedSquare = PLACE;
-        
-        child = null;
     }
 
     public Move(int x, int y, int jumpedSquare) {

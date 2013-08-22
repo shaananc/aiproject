@@ -4,21 +4,20 @@
  */
 package gameai;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.PriorityQueue;
 
 /**
  *
  * @author SHAANAN
  */
-public class Move {
+public class Move implements Comparable<Move> {
 
     protected static final int SELF_JUMP = -1;
     protected static final int PLACE = -2;
     int x, y;
     int jumpedSquare;
     int numSubJumps;
-    List<Move> compJumps;
+    PriorityQueue<Move> compJumps;
 
     public Move() {
     }
@@ -33,6 +32,12 @@ public class Move {
     public Move(int x, int y, int jumpedSquare) {
         this(x,y);
         this.jumpedSquare = jumpedSquare;
-        this.compJumps = new LinkedList<>();
+        this.compJumps = new PriorityQueue();
     }
+
+    @Override
+    public int compareTo(Move o) {
+        return ((Integer)((Move)o).numSubJumps).compareTo(numSubJumps);
+    }
+    
 }

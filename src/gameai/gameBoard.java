@@ -32,8 +32,10 @@ public class gameBoard {
     public gameBoard(int n) {
         this.dirs = new int[]{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
 
-        pieces = new BitSet();
-        mask = new BitSet();
+        pieces = new BitSet(n);
+        mask = new BitSet(n);
+        pieces.set(0, n, false);
+        mask.set(0, n, false);
         this.n = n;
     }
 
@@ -42,8 +44,8 @@ public class gameBoard {
         n = s.nextInt();
         dirs = new int[]{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
 
-        pieces = new BitSet();
-        mask = new BitSet();
+        pieces = new BitSet(n);
+        mask = new BitSet(n);
 
 
         int loc = 0;
@@ -288,7 +290,7 @@ public class gameBoard {
                 if(isWhite(loc)){str = str + "W";}
                 else if(isBlack(loc)){str = str + "B";}
                 else if(isDead(loc)){str = str + "X";}
-                else if(isBlack(loc)){str = str + "-";}
+                else {str = str + "-";}
                 
                 str = str + " ";
             }
@@ -314,6 +316,35 @@ public class gameBoard {
         while (!toplay.isEmpty()) {
             System.out.println(this.executeMove(toplay.remove()));
         }
+    }
+    
+    public int getDepth(){
+        BitSet over = ((BitSet)pieces.clone());
+        over.or(mask);
+        return over.cardinality();
+    }
+    
+    public boolean isOver(){
+        
+        return getDepth() >= n*n;
+    }
+    
+    public int[] getNumbers(){
+        int[] ret = new int[2];
+        ret[0] = 0;
+        ret[1] = 0;
+        for(int i = 0; i < n; i++){
+           if(isWhite(n)){ret[0]+= 1;}
+           if(isBlack(n)){ret[1]+= 1;}
+        }
+        return ret;
+    }
+    
+    public List<Move> getMoves(){
+        List<Move> ret = getJumpMoves();
+        ret.addAll(getPlaceMoves());
+        return ret;
+        
     }
 
     public static void run(InputStream in) {

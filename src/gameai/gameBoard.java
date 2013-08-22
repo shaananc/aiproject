@@ -206,7 +206,10 @@ public class gameBoard {
     }
 
     public void enumerateJumpTree(Move m, gameBoard gb, List<Move> path, List<List<Move>> all_moves) {
-        List<Move> possibleMoves = getSpaceJumps(m.x, m.y);
+        System.out.println("Enumerating Tree From: " + "\n");
+        System.out.println(gb);
+
+        List<Move> possibleMoves = gb.getSpaceJumps(m.x, m.y);
         if (possibleMoves.isEmpty()) {
             return;
         } else {
@@ -214,7 +217,10 @@ public class gameBoard {
                 List<Move> path_prime = new ArrayList<>(path);
                 path_prime.add(m_prime);
                 all_moves.add(path_prime);
-                enumerateJumpTree(m_prime, gb.executeMove(m_prime), path_prime, all_moves);
+                gameBoard gb_prime = gb.executeMove(m_prime);
+                System.out.println("move in jump tree: " + m.x + ":" + m.y + "\n");
+                System.out.println(gb);
+                enumerateJumpTree(m_prime, gb_prime, path_prime, all_moves);
             }
         }
     }
@@ -237,17 +243,17 @@ public class gameBoard {
     public gameBoard executeCompound(List<Move> moves) {
         gameBoard gb = this.deepCopy();
         boolean jump = true;
-        if(moves.get(0).jumpedSquare == Move.PLACE){
+        if (moves.get(0).jumpedSquare == Move.PLACE) {
             jump = false;
         }
         while (!moves.isEmpty()) {
             gb = gb.executeMove(moves.remove(0));
         }
         // Flip turns for jump
-        if(jump){
+        if (jump) {
             gb.turn = !gb.turn;
         }
-        
+
         return gb;
     }
 
@@ -265,6 +271,8 @@ public class gameBoard {
     }
 
     private List<Move> getSpaceJumps(int x, int y) {
+        
+
         int num = y * n + x;
 
         // Right 0, Left 1, Down 2, Up 3, Down-Right 4, Down-Left 5, Up-Right 6, Up-Left, 7
@@ -378,9 +386,9 @@ public class gameBoard {
         return ret;
     }
 
-    public List<List <Move> > getMoves() {
-        List<List <Move>> ret = getJumpMoves();
-        for(Move m : getPlaceMoves()){
+    public List<List<Move>> getMoves() {
+        List<List<Move>> ret = getJumpMoves();
+        for (Move m : getPlaceMoves()) {
             List t = new ArrayList();
             t.add(m);
             ret.add(t);

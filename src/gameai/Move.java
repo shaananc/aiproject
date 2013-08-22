@@ -20,6 +20,7 @@ public class Move implements Comparable<Move> {
     PriorityQueue<Move> compJumps;
 
     public Move() {
+        this.jumpedSquare = PLACE;
     }
 
     public Move(int x, int y) {

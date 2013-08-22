@@ -13,20 +13,25 @@ import java.util.List;
  */
 public class NegaScout {
 
-    int maxdepth = 4;
+    int maxdepth = 2;
 
     int Evaluate(gameBoard gb, List<Move> m) {
 
         int[] numbers = gb.getNumbers();
-
-        //System.out.println(gb);
-        //System.out.println(numbers[0] +":"+numbers[1]+"\n");
-
+        int ret;
+        
+        
         if (gb.turn != gameBoard.WHITE) {
-            return numbers[0] - numbers[1];
+             ret = numbers[0] - numbers[1];
         } else {
-            return numbers[1] - numbers[0];
+            ret = numbers[1] - numbers[0];
         }
+        
+        //System.out.println(gb);
+        //System.out.println("Ret: " + ret + " " + Integer.toString(numbers[0]) + " " + Integer.toString(numbers[1]) + "\n");
+        
+        
+        return ret;
     }
 
     // TODO - evaluate use of depth.

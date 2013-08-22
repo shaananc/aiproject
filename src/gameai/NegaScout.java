@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class NegaScout {
 
-    int maxdepth = 3;
+    int maxdepth = 4;
 
     int Evaluate(gameBoard gb, List<Move> m) {
 
@@ -61,11 +61,11 @@ public class NegaScout {
     public static void main(String[] args) {
         NegaScout ns = new NegaScout();
         
-        String boardString = "4\n"
-                + "- - - -\n"
-                + "- W W -\n"
-                + "- B - -\n"
-                + "- - - -\n";
+        String boardString = "5\n"
+                + "- - - - -\n"
+                + "- W W - -\n"
+                + "- B - - -\n"
+                + "- - - - -\n";
         
         gameBoard gb = new gameBoard(new ByteArrayInputStream((boardString.toString()).getBytes()));
         System.out.println(gb);

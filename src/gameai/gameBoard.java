@@ -194,8 +194,8 @@ public class gameBoard {
                     for (Move move : getSpaceJumps(x, y)) {
                         List<Move> path = new ArrayList<>();
                         path.add(move);
+                        all_moves.add(path);
                         enumerateJumpTree(move, executeMove(move), path, all_moves);
-                        //all_moves.add(move);
                     }
                 }
             }

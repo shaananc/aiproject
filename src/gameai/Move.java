@@ -4,12 +4,13 @@
  */
 package gameai;
 
-import java.util.PriorityQueue;
 
 /**
  *
  * @author SHAANAN
  */
+
+// Todo - Change x,y to a single int
 public class Move  {
 
     protected static final int SELF_JUMP = -1;

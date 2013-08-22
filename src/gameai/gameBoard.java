@@ -17,8 +17,6 @@ import java.util.Scanner;
  *
  * @author SHAANAN
  */
-
-
 public class gameBoard {
 
     protected static final boolean WHITE = true;
@@ -75,7 +73,6 @@ public class gameBoard {
     }
 
     // 11 black, 10, white, 00, clear, 01 X
-    
     public boolean isWhite(int loc) {
         return (!pieces.get(loc) && mask.get(loc));
     }
@@ -186,8 +183,8 @@ public class gameBoard {
         return count;
     }
 
-    public List<Move> getJumpMoves() {
-        List<Move> moves = new ArrayList<>();
+    public List<List<Move>> getJumpMoves() {
+        List<List<Move>> all_moves = new ArrayList<>();
 
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
@@ -195,15 +192,31 @@ public class gameBoard {
                 /* If the space is populated by your color and is a jump */
                 if (isMyPiece(num)) {
                     for (Move move : getSpaceJumps(x, y)) {
-                        jumpDFS(move, this);
-                        moves.add(move);
+                        List<Move> path = new ArrayList<>();
+                        path.add(move);
+                        enumerateJumpTree(move, executeMove(move), path, all_moves);
+                        //all_moves.add(move);
                     }
                 }
             }
         }
 
 
-        return moves;
+        return all_moves;
+    }
+
+    public void enumerateJumpTree(Move m, gameBoard gb, List<Move> path, List<List<Move>> all_moves) {
+        List<Move> possibleMoves = getSpaceJumps(m.x, m.y);
+        if (possibleMoves.isEmpty()) {
+            return;
+        } else {
+            for (Move m_prime : possibleMoves) {
+                List<Move> path_prime = new ArrayList<>(path);
+                path_prime.add(m_prime);
+                all_moves.add(path_prime);
+                enumerateJumpTree(m_prime, gb.executeMove(m_prime), path_prime, all_moves);
+            }
+        }
     }
 
     public int countJumpMoves() {
@@ -221,13 +234,29 @@ public class gameBoard {
         return count;
     }
 
+    public gameBoard executeCompound(List<Move> moves) {
+        gameBoard gb = this.deepCopy();
+        boolean jump = true;
+        if(moves.get(0).jumpedSquare == Move.PLACE){
+            jump = false;
+        }
+        while (!moves.isEmpty()) {
+            gb = gb.executeMove(moves.remove(0));
+        }
+        // Flip turns for jump
+        if(jump){
+            gb.turn = !gb.turn;
+        }
+        
+        return gb;
+    }
+
     public int jumpDFS(Move move, gameBoard gb) {
 
         int count = 0;
 
         gameBoard gb_prime = gb.executeMove(move);
         for (Move move_prime : gb_prime.getSpaceJumps(move.x, move.y)) {
-            move.compJumps.add(move_prime);
             count += 1;
             count += jumpDFS(move_prime, gb_prime);
         }
@@ -285,16 +314,21 @@ public class gameBoard {
         String str = "";
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
-                
+
                 int loc = y * n + x;
-                if(isWhite(loc)){str = str + "W";}
-                else if(isBlack(loc)){str = str + "B";}
-                else if(isDead(loc)){str = str + "X";}
-                else {str = str + "-";}
-                
+                if (isWhite(loc)) {
+                    str = str + "W";
+                } else if (isBlack(loc)) {
+                    str = str + "B";
+                } else if (isDead(loc)) {
+                    str = str + "X";
+                } else {
+                    str = str + "-";
+                }
+
                 str = str + " ";
             }
-            
+
             str = str.trim();
             str = str + "\n";
         }
@@ -317,34 +351,42 @@ public class gameBoard {
             System.out.println(this.executeMove(toplay.remove()));
         }
     }
-    
-    public int getDepth(){
-        BitSet over = ((BitSet)pieces.clone());
+
+    public int getDepth() {
+        BitSet over = ((BitSet) pieces.clone());
         over.or(mask);
         return over.cardinality();
     }
-    
-    public boolean isOver(){
-        
-        return getDepth() >= n*n;
+
+    public boolean isOver() {
+
+        return getDepth() >= n * n;
     }
-    
-    public int[] getNumbers(){
+
+    public int[] getNumbers() {
         int[] ret = new int[2];
         ret[0] = 0;
         ret[1] = 0;
-        for(int i = 0; i < n; i++){
-           if(isWhite(n)){ret[0]+= 1;}
-           if(isBlack(n)){ret[1]+= 1;}
+        for (int i = 0; i < n; i++) {
+            if (isWhite(n)) {
+                ret[0] += 1;
+            }
+            if (isBlack(n)) {
+                ret[1] += 1;
+            }
         }
         return ret;
     }
-    
-    public List<Move> getMoves(){
-        List<Move> ret = getJumpMoves();
-        ret.addAll(getPlaceMoves());
+
+    public List<List <Move> > getMoves() {
+        List<List <Move>> ret = getJumpMoves();
+        for(Move m : getPlaceMoves()){
+            List t = new ArrayList();
+            t.add(m);
+            ret.add(t);
+        }
         return ret;
-        
+
     }
 
     public static void run(InputStream in) {

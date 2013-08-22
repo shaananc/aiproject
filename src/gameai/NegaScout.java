@@ -12,9 +12,9 @@ import java.util.List;
  */
 public class NegaScout {
 
-    int maxdepth = 3;
+    int maxdepth = 1;
 
-    int Evaluate(gameBoard gb, Move m) {
+    int Evaluate(gameBoard gb, List<Move> m) {
 
         int[] numbers = gb.getNumbers();
 
@@ -27,7 +27,7 @@ public class NegaScout {
         }
     }
 
-    public int negascout(gameBoard gb, Move p, int alpha, int beta) {
+    public int negascout(gameBoard gb, List<Move> p, int alpha, int beta) {
         int a, b, t, i;
 
         int d = gb.getDepth();
@@ -36,15 +36,15 @@ public class NegaScout {
             return Evaluate(gb, p);
         }
 
-        List<Move> successors = gb.getMoves();
+        List<List <Move>> successors = gb.getMoves();
         a = alpha;
         b = beta;
 
         i = 1;
-        for (Move m : successors) {
-            t = -negascout(gb.executeMove(m), m, -b, -a);
+        for (List <Move> moveList : successors) {
+            t = -negascout(gb.executeCompound(moveList), moveList, -b, -a);
             if ((t > a) && (t < beta) && (i > 1) && (d < maxdepth - 1)) {
-                a = -negascout(gb.executeMove(m), m, -beta, -t);
+                a = -negascout(gb.executeCompound(moveList), moveList, -beta, -t);
             }
             a = Math.max(a, t);
             if (a >= beta) {
@@ -60,10 +60,10 @@ public class NegaScout {
         NegaScout ns = new NegaScout();
         gameBoard gb = new gameBoard(System.in);
         System.out.println(gb);
-        List<Move> moves = gb.getMoves();
-        for (Move m : moves) {
+        List<List <Move>> moves = gb.getMoves();
+        for (List<Move> m : moves) {
             gameBoard c = gb.deepCopy();
-            System.out.println(c.executeMove(m));
+            System.out.println(c.executeCompound(m));
             System.out.println(ns.negascout(c, m, Integer.MIN_VALUE, Integer.MAX_VALUE));
         }
 

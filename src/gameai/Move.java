@@ -10,35 +10,31 @@ import java.util.PriorityQueue;
  *
  * @author SHAANAN
  */
-public class Move implements Comparable<Move> {
+public class Move  {
 
     protected static final int SELF_JUMP = -1;
     protected static final int PLACE = -2;
     int x, y;
     int jumpedSquare;
-    int numSubJumps;
-    PriorityQueue<Move> compJumps;
+    Move child;
 
     public Move() {
         this.jumpedSquare = PLACE;
+        child = null;
     }
 
     public Move(int x, int y) {
         this.x = x;
         this.y = y;
         this.jumpedSquare = PLACE;
-        numSubJumps = 0;
+        
+        child = null;
     }
 
     public Move(int x, int y, int jumpedSquare) {
         this(x,y);
         this.jumpedSquare = jumpedSquare;
-        this.compJumps = new PriorityQueue();
     }
-
-    @Override
-    public int compareTo(Move o) {
-        return ((Integer)((Move)o).numSubJumps).compareTo(numSubJumps);
-    }
+    
     
 }

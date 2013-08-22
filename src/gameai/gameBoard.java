@@ -218,8 +218,8 @@ public class gameBoard {
                 path_prime.add(m_prime);
                 all_moves.add(path_prime);
                 gameBoard gb_prime = gb.executeMove(m_prime);
-                System.out.println("move in jump tree: " + m.x + ":" + m.y + "\n");
-                System.out.println(gb);
+                //System.out.println("move in jump tree: " + m.x + ":" + m.y + "\n");
+                //System.out.println(gb);
                 enumerateJumpTree(m_prime, gb_prime, path_prime, all_moves);
             }
         }

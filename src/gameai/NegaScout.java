@@ -60,7 +60,7 @@ public class NegaScout {
         NegaScout ns = new NegaScout();
         gameBoard gb = new gameBoard(System.in);
         System.out.println(gb);
-        List<List <Move>> moves = gb.getMoves();
+        List<List <Move>> moves = gb.getJumpMoves();
         for (List<Move> m : moves) {
             gameBoard c = gb.deepCopy();
             System.out.println(c.executeCompound(m));

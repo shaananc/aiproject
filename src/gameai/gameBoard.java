@@ -206,8 +206,8 @@ public class gameBoard {
     }
 
     public void enumerateJumpTree(Move m, gameBoard gb, List<Move> path, List<List<Move>> all_moves) {
-        System.out.println("Enumerating Tree From: " + "\n");
-        System.out.println(gb);
+        //System.out.println("Enumerating Tree From: " + "\n");
+        //System.out.println(gb);
 
         List<Move> possibleMoves = gb.getSpaceJumps(m.x, m.y);
         if (possibleMoves.isEmpty()) {
@@ -375,11 +375,11 @@ public class gameBoard {
         int[] ret = new int[2];
         ret[0] = 0;
         ret[1] = 0;
-        for (int i = 0; i < n; i++) {
-            if (isWhite(n)) {
+        for (int i = 0; i < n*n-1; i++) {
+            if (isWhite(i)) {
                 ret[0] += 1;
             }
-            if (isBlack(n)) {
+            if (isBlack(i)) {
                 ret[1] += 1;
             }
         }

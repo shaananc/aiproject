@@ -241,8 +241,8 @@ public class gameBoard {
         if (moves.get(0).jumpedSquare == Move.PLACE) {
             jump = false;
         }
-        while (!moves.isEmpty()) {
-            gb = gb.executeMove(moves.remove(0));
+        for (int i =0; i< moves.size(); i++) {
+            gb = gb.executeMove(moves.get(i));
         }
         // Flip turns for jump
         if (jump) {

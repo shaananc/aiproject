@@ -20,18 +20,20 @@ public class NegaScout {
         int[] numbers = gb.getNumbers();
         int ret;
         
+
+        return m.get(0).x;
         
-        if (gb.turn != gameBoard.WHITE) {
-             ret = numbers[0] - numbers[1];
-        } else {
-            ret = numbers[1] - numbers[0];
-        }
+        //if (gb.turn != gameBoard.WHITE) {
+        //     ret = numbers[0] - numbers[1];
+        //} else {
+        //    ret = numbers[1] - numbers[0];
+        //}
         
         //System.out.println(gb);
         //System.out.println("Ret: " + ret + " " + Integer.toString(numbers[0]) + " " + Integer.toString(numbers[1]) + "\n");
         
         
-        return ret;
+        //return ret;
     }
 
     // TODO - evaluate use of depth.
@@ -44,6 +46,9 @@ public class NegaScout {
         }
 
         List<List <Move>> successors = gb.getMoves();
+        
+
+        
         a = alpha;
         b = beta;
 

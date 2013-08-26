@@ -370,7 +370,7 @@ public class gameBoard {
         int[] ret = new int[2];
         ret[0] = 0;
         ret[1] = 0;
-        for (int i = 0; i < n * n - 1; i++) {
+        for (int i = 0; i < n * n; i++) {
             if (isWhite(i)) {
                 ret[0] += 1;
             }

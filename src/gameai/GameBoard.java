@@ -17,7 +17,7 @@ import java.util.Scanner;
  *
  * @author SHAANAN
  */
-public class gameBoard {
+public class GameBoard {
 
     protected static final boolean WHITE = true;
     protected static final boolean BLACK = false;
@@ -27,7 +27,7 @@ public class gameBoard {
     BitSet mask;
     int n;
 
-    public gameBoard(int n) {
+    public GameBoard(int n) {
         this.dirs = new int[]{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
 
         pieces = new BitSet(n);
@@ -37,7 +37,7 @@ public class gameBoard {
         this.n = n;
     }
 
-    public gameBoard(InputStream boardStream) {
+    public GameBoard(InputStream boardStream) {
         Scanner s = new Scanner(boardStream);
         n = s.nextInt();
         dirs = new int[]{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
@@ -88,6 +88,10 @@ public class gameBoard {
         return (mask.get(loc) && (pieces.get(loc) == turn));
     }
 
+    public boolean isEnemyPiece(int loc) {
+        return (mask.get(loc) && (pieces.get(loc) != turn));
+    }
+
     public boolean isFull(int loc) {
         return mask.get(loc);
     }
@@ -112,12 +116,12 @@ public class gameBoard {
         mask.clear(loc);
     }
 
-    public gameBoard executeMove(Move move) {
+    public GameBoard executeMove(Move move) {
 
         int x = move.x;
         int y = move.y;
 
-        gameBoard gb = (gameBoard) this.deepCopy();
+        GameBoard gb = (GameBoard) this.deepCopy();
 
 
         int num = y * n + x;
@@ -179,7 +183,7 @@ public class gameBoard {
     }
 
     public List<List<Move>> getJumpMoves() {
-        List<List<Move>> all_moves = new ArrayList<List <Move>>();
+        List<List<Move>> all_moves = new ArrayList<List<Move>>();
 
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
@@ -200,7 +204,7 @@ public class gameBoard {
         return all_moves;
     }
 
-    public void enumerateJumpTree(Move m, gameBoard gb, List<Move> path, List<List<Move>> all_moves) {
+    public void enumerateJumpTree(Move m, GameBoard gb, List<Move> path, List<List<Move>> all_moves) {
         //System.out.println("Enumerating Tree From: " + "\n");
         //System.out.println(gb);
 
@@ -212,7 +216,7 @@ public class gameBoard {
                 List<Move> path_prime = new ArrayList<Move>(path);
                 path_prime.add(m_prime);
                 all_moves.add(path_prime);
-                gameBoard gb_prime = gb.executeMove(m_prime);
+                GameBoard gb_prime = gb.executeMove(m_prime);
                 //System.out.println("move in jump tree: " + m.x + ":" + m.y + "\n");
                 //System.out.println(gb);
                 enumerateJumpTree(m_prime, gb_prime, path_prime, all_moves);
@@ -235,13 +239,13 @@ public class gameBoard {
         return count;
     }
 
-    public gameBoard executeCompound(List<Move> moves) {
-        gameBoard gb = this.deepCopy();
+    public GameBoard executeCompound(List<Move> moves) {
+        GameBoard gb = this.deepCopy();
         boolean jump = true;
         if (moves.get(0).jumpedSquare == Move.PLACE) {
             jump = false;
         }
-        for (int i =0; i< moves.size(); i++) {
+        for (int i = 0; i < moves.size(); i++) {
             gb = gb.executeMove(moves.get(i));
         }
         // Flip turns for jump
@@ -252,11 +256,11 @@ public class gameBoard {
         return gb;
     }
 
-    public int jumpDFS(Move move, gameBoard gb) {
+    public int jumpDFS(Move move, GameBoard gb) {
 
         int count = 0;
 
-        gameBoard gb_prime = gb.executeMove(move);
+        GameBoard gb_prime = gb.executeMove(move);
         for (Move move_prime : gb_prime.getSpaceJumps(move.x, move.y)) {
             count += 1;
             count += jumpDFS(move_prime, gb_prime);
@@ -339,8 +343,8 @@ public class gameBoard {
 
     }
 
-    public gameBoard deepCopy() {
-        gameBoard gb = new gameBoard(this.n);
+    public GameBoard deepCopy() {
+        GameBoard gb = new GameBoard(this.n);
         gb.turn = turn;
         gb.mask = (BitSet) mask.clone();
         gb.pieces = (BitSet) pieces.clone();
@@ -393,10 +397,10 @@ public class gameBoard {
     }
 
     public static void run(InputStream in) {
-        gameBoard gb = new gameBoard(in);
-        gb.turn = gameBoard.WHITE;
+        GameBoard gb = new GameBoard(in);
+        gb.turn = GameBoard.WHITE;
         System.out.println("W " + gb.getPlaceMoves().size() + " " + gb.countJumpMoves());
-        gb.turn = gameBoard.BLACK;
+        gb.turn = GameBoard.BLACK;
         System.out.println("B " + gb.getPlaceMoves().size() + " " + gb.countJumpMoves());
     }
 

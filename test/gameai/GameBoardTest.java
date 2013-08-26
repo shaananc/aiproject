@@ -18,9 +18,9 @@ import static org.junit.Assert.*;
  *
  * @author SHAANAN
  */
-public class gameBoardTest {
+public class GameBoardTest {
 
-    public gameBoardTest() {
+    public GameBoardTest() {
         String test = 
                  "- - W W W -\n"
                 + "- - W X - -\n"
@@ -28,7 +28,7 @@ public class gameBoardTest {
                 + "- - - - - -\n"
                 + "- - - - - -\n"
                 + "B - - - - -\n";
-        gameBoard gb = new gameBoard(new ByteArrayInputStream(("6\n"+test).getBytes()));
+        GameBoard gb = new GameBoard(new ByteArrayInputStream(("6\n"+test).getBytes()));
         assertEquals(test,gb.toString());
     
     }
@@ -44,12 +44,12 @@ public class gameBoardTest {
                 + "B X W W X W\n"
                 + "X B B B X X\n"
                 + "B B B X W W\n";
-        gameBoard gb = new gameBoard(new ByteArrayInputStream(full.getBytes()));
+        GameBoard gb = new GameBoard(new ByteArrayInputStream(full.getBytes()));
         
-        gb.turn = gameBoard.WHITE;
+        gb.turn = GameBoard.WHITE;
         assertEquals(4,gb.countJumpMoves());
 
-        gb.turn = gameBoard.BLACK;
+        gb.turn = GameBoard.BLACK;
         assertEquals(2,gb.countJumpMoves());
         
     }

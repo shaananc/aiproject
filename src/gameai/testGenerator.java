@@ -29,7 +29,7 @@ public class testGenerator {
         }
         
         for (int i = 0; i < 100; i = i + 1) {
-            gameBoard gb = generateBoard(6);
+            GameBoard gb = generateBoard(6);
             
             try {
                 PrintWriter out = new PrintWriter(new FileWriter("tests/board"+i+".txt"));
@@ -39,13 +39,13 @@ public class testGenerator {
                 Logger.getLogger(testGenerator.class.getName()).log(Level.SEVERE, null, ex);
             }
             
-            gameBoard.run(new ByteArrayInputStream(("6\n"+gb.toString()).getBytes()));
+            GameBoard.run(new ByteArrayInputStream(("6\n"+gb.toString()).getBytes()));
         }
         System.setOut(stdout);
     }
 
-    public static gameBoard generateBoard(int n) {
-        gameBoard gb = new gameBoard(n);
+    public static GameBoard generateBoard(int n) {
+        GameBoard gb = new GameBoard(n);
 
         Random gen = new Random();
         // pick random fill size

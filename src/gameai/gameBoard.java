@@ -49,24 +49,19 @@ public class gameBoard {
         int loc = 0;
         while (s.hasNext()) {
             String t = s.next();
-            switch (t) {
-                case "-":
-                    break;
-                case "B":
-                    mask.set(loc);
-                    break;
-                case "W":
-                    mask.set(loc);
-                    pieces.set(loc);
-                    break;
-                case "X":
-                    pieces.set(loc);
-                    break;
-                case "EOF":
-                    return;
-                default:
-                    System.out.println("Error parsing boardString -- unidentified char:" + t);
-                    System.exit(0);
+            if (t.equals("-")) {
+            } else if (t.equals("B")) {
+                mask.set(loc);
+            } else if (t.equals("W")) {
+                mask.set(loc);
+                pieces.set(loc);
+            } else if (t.equals("X")) {
+                pieces.set(loc);
+            } else if (t.equals("EOF")) {
+                return;
+            } else {
+                System.out.println("Error parsing boardString -- unidentified char:" + t);
+                System.exit(0);
             }
             loc += 1;
         }
@@ -158,7 +153,7 @@ public class gameBoard {
      * Is this the best algorithm to get moves? */
     /* O(size) */
     public List<Move> getPlaceMoves() {
-        List<Move> moves = new ArrayList<>();
+        List<Move> moves = new ArrayList<Move>();
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
                 int num = y * n + x;
@@ -184,7 +179,7 @@ public class gameBoard {
     }
 
     public List<List<Move>> getJumpMoves() {
-        List<List<Move>> all_moves = new ArrayList<>();
+        List<List<Move>> all_moves = new ArrayList<List <Move>>();
 
         for (int y = 0; y < n; y++) {
             for (int x = 0; x < n; x++) {
@@ -192,7 +187,7 @@ public class gameBoard {
                 /* If the space is populated by your color and is a jump */
                 if (isMyPiece(num)) {
                     for (Move move : getSpaceJumps(x, y)) {
-                        List<Move> path = new ArrayList<>();
+                        List<Move> path = new ArrayList<Move>();
                         path.add(move);
                         all_moves.add(path);
                         enumerateJumpTree(move, executeMove(move), path, all_moves);
@@ -214,7 +209,7 @@ public class gameBoard {
             return;
         } else {
             for (Move m_prime : possibleMoves) {
-                List<Move> path_prime = new ArrayList<>(path);
+                List<Move> path_prime = new ArrayList<Move>(path);
                 path_prime.add(m_prime);
                 all_moves.add(path_prime);
                 gameBoard gb_prime = gb.executeMove(m_prime);
@@ -271,13 +266,13 @@ public class gameBoard {
     }
 
     private List<Move> getSpaceJumps(int x, int y) {
-        
+
 
         int num = y * n + x;
 
         // Right 0, Left 1, Down 2, Up 3, Down-Right 4, Down-Left 5, Up-Right 6, Up-Left, 7
         //{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
-        List<Move> moves = new ArrayList<>();
+        List<Move> moves = new ArrayList<Move>();
 
         for (int i = 0; i < 8; i++) {
 
@@ -353,7 +348,7 @@ public class gameBoard {
     }
 
     public void printMoves(Collection<Move> moves) {
-        Queue<Move> toplay = new LinkedList<>();
+        Queue<Move> toplay = new LinkedList<Move>();
         toplay.addAll(moves);
         while (!toplay.isEmpty()) {
             System.out.println(this.executeMove(toplay.remove()));
@@ -375,7 +370,7 @@ public class gameBoard {
         int[] ret = new int[2];
         ret[0] = 0;
         ret[1] = 0;
-        for (int i = 0; i < n*n-1; i++) {
+        for (int i = 0; i < n * n - 1; i++) {
             if (isWhite(i)) {
                 ret[0] += 1;
             }

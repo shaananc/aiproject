@@ -1,6 +1,9 @@
 *.class
 
-# Package Files #
+# package files
 *.jar
 *.war
 *.ear
+
+# tests
+shaanan_test_boards/*

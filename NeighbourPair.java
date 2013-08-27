@@ -1,5 +1,12 @@
-// used for when one is looking for possible jump moves, and is considering pairs of cells which are
-// both adjacent and 2-away from a given cell
+/* Mitchell Brunton - mbrunton
+   Shaanan Cohney   - sncohney
+*/
+
+/* NeighbourPair objects hold two Pos (position) values, one representing
+   the neighbour of a given cell, and the other representing that neighbour's
+   neighbour, in the same direction. They are used when looking for possible
+   jump moves
+*/
 
 public class NeighbourPair {
 	Pos neighbour;

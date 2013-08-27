@@ -1,4 +1,13 @@
+/* Mitchell Brunton - mbrunton
+   Shaanan Cohney   - sncohney
+*/
+
 import java.util.ArrayList;
+
+/* Gameboard class represents a snapshot of a game of Jumper
+   Actual board is an array of Cells, each of which can be
+   in one of four states
+*/
 
 public class Gameboard implements Cloneable {
 

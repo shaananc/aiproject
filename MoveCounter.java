@@ -1,6 +1,14 @@
+/* Mitchell Brunton - mbrunton
+   Shaanan Cohney   - sncohney
+*/
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+/* MoveCounter objects are used to count the number of legal
+   moves possible for a given player on a given gameboard
+*/
 
 public class MoveCounter {
 
@@ -97,6 +105,6 @@ public class MoveCounter {
 	}
 
 	public void storeCache() {
-		/* TODO: store cache values locally in XML datastruct */
+		/* TODO: store cache values locally in XML */
 	}
 }

@@ -9,7 +9,7 @@ import java.util.ArrayList;
    in one of four states
 */
 
-public class Gameboard implements Cloneable {
+public class Gameboard {
 
 	private int n;
 	public Cell[] board;
@@ -67,52 +67,58 @@ public class Gameboard implements Cloneable {
 		return new Gameboard(aGameboard);
 	}
 	
-	// returns ArrayList of NeighbourPairs for a given Pos, where a NeighbourPair
-	// consists of 2 Pos's radially adjacent to "pos", where a piece situated on
-	// "pos" could potentially jump over NeighbourPair.neighbour and onto
-	// NeighbourPair.neighboursNeighbour
+	/* returns ArrayList of NeighbourPairs for a given Pos, where a NeighbourPair
+	   consists of 2 Pos's radially adjacent to "pos", where a piece situated on
+	   "pos" could potentially jump over NeighbourPair.neighbour and onto
+	   NeighbourPair.neighboursNeighbour
+    */
 	public ArrayList<NeighbourPair> getNeighbourPairs(Pos pos) {
 		int i = pos.i;
 		int j = pos.j;
+        boolean hasLeft = j-2 >= 0;
+        boolean hasRight = j+2 < n;
+        boolean hasUp = i-2 >= 0;
+        boolean hasDown = i+2 < n;
+
 		ArrayList<NeighbourPair> neighbourPairs = new ArrayList<NeighbourPair>();
 
 		// top left
-		if ( (i-2) >= 0 && (j-2) >= 0 ) {
+		if ( hasLeft && hasUp ) {
 			neighbourPairs.add( new NeighbourPair(new Pos(i-1, j-1), new Pos(i-2, j-2)) );
 		}
 
 		// left
-		if ( (j-2) >= 0 ) {
+		if ( hasLeft ) {
 			neighbourPairs.add( new NeighbourPair(new Pos(i, j-1), new Pos(i, j-2)) );
 		}
 
 		// bottom left
-		if ( (i+2) < n && (j-2) >= 0 ) {
+		if ( hasLeft && hasDown ) {
 			neighbourPairs.add( new NeighbourPair(new Pos(i+1, j-1), new Pos(i+2, j-2)) );
 		}
 
 		// bottom
-		if ( (i+2) < n ) {
+		if ( hasDown ) {
 			neighbourPairs.add( new NeighbourPair(new Pos(i+1, j), new Pos(i+2, j)) );
 		}
 
 		// bottom right
-		if ( (i+2) < n && (j+2) < n ) {
+		if ( hasRight && hasDown ) {
 			neighbourPairs.add( new NeighbourPair(new Pos(i+1, j+1), new Pos(i+2, j+2)) );
 		}
 
 		// right
-		if ( (j+2) < n ) {
+		if ( hasRight ) {
 			neighbourPairs.add( new NeighbourPair(new Pos(i, j+1), new Pos(i, j+2)) );
 		}
 
 		// top right
-		if ( (i-2) >= 0 && (j+2) < n) {
+		if ( hasRight && hasUp ) {
 			neighbourPairs.add( new NeighbourPair(new Pos(i-1, j+1), new Pos(i-2, j+2)) );
 		}
 
 		// top
-		if ( (i-2) >= 0 ) {
+		if ( hasUp ) {
 			neighbourPairs.add( new NeighbourPair(new Pos(i-1, j), new Pos(i-2, j)) );
 		}
 

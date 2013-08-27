@@ -7,3 +7,6 @@
 
 # tests
 shaanan_test_boards/*
+
+# annoying mac querk
+.DS_Store

@@ -1,4 +1,54 @@
 Mitchell Brunton - mbrunton
 Shaanan Cohney   - sncohney
 
--- insert report here --
+For part A of this project, we decided to implement our own, separate
+ideas for solving the problem of counting the number of legal place/
+jump moves for both players. The reasons for this were two-fold:
+firstly, having two different programs which produced the same
+output for a variety of inputs would increase our confidence that our
+solutions were correct, and secondly, we both had different ideas as
+to how to structure our project, and having two quite separate
+implementations would allow us to explore the benefits/pitfalls of each,
+both in terms of time/space efficiency and code readability.
+
+-- Mitchell's Code --
+The general structure of Mitchell's code is as follows. A Gameboard
+object contains an array of Cell objects, each of which as a STATE
+enum set to one of four values (E, B, W, X).
+The MoveCounter class creates objects which count the number of legal
+moves for a given Gameboard. MoveCounter's countPlaceMoves method
+scans through the cells of a Gameboard object, and returns the
+number of empty cells, for a time complexity of O(n^2). MoveCounter's
+countJumpMoves method scans through the Gameboard's cells, and for
+each cell of state 'player', adds the result of the recursive
+countJumpMovesFromPos method to a running tally. countJumpMovesFromPos
+takes a Gameboard, and a Pos as arguments. It first creates an
+ArrayList of NeighbourPairs, which holds (neighbour, neighbour's neighbour)
+pairs, such that a piece situated on the current position might jump over
+a neighbour onto that neighbour's neighbour.
+For example, if the following Gameboard was passed to countJumpMovesFromPos
+with position '*':
+
+* 2 3
+4 5 6
+7 8 9
+
+the resulting NeighbourPairs would be (2, 3), (5, 9), and (4, 7).
+For each NeighbourPair, if neighbour is occupied by a piece, and neighbour's
+neighbour is empty, the corresponding single jump move is made on a child board,
+and (1 + countJumpMovesFromPos(child board, neighbour's neighbour's pos)) is
+added to a running tally.
+
+The worst-case complexity of countJumpMovesFromPos is difficult to state
+precisely, however a (drastic) overestimate of XXX can be achieved
+as follows: countJumpMoves scans each of the n*n cells, and for each cell, a 
+recursive call is made to countJumpMovesFromPos. Each countJumpMovesFromPos call
+can make a maximum of 8 more calls to the same function, and does a constant
+amount of work. If we imagine a cell in the centre of the board, and it makes 8
+calls to countJumpMovesFromPos for each of the 8 possible jump moves from that
+location, and then each of those calls make 8 subsequent calls, this process
+could theoretically continue until... 
+
+-- Shaanan's code --
+
+-- Comparison --

@@ -108,3 +108,5 @@ public class MoveCounter {
 		/* TODO: store cache values locally in XML */
 	}
 }
+
+

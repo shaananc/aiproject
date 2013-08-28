@@ -13,7 +13,7 @@ import java.util.Scanner;
  */
 public class NegaScout {
 
-    int maxdepth = 9;
+    int maxdepth = 3;
 
     int Evaluate(GameBoard gb, List<Move> m) {
 
@@ -22,30 +22,6 @@ public class NegaScout {
 
         int[] numbers = gb.getNumbers();
         int ret = numbers[0] - numbers[1];
-
-
-        // sample function to test
-//        int sum = 0;
-//        for (int i = 0; i < Math.pow(gb.n, 2); i++) {
-//            if (gb.isMyPiece(i)) {
-//                sum = sum + i + 1;
-//            } else if (gb.isEnemyPiece(i)) {
-//                sum = sum - i - 1;
-//            }
-//        }
-//        if (sum != -100) {
-//            return sum;
-//        }
-
-
-//        if (gb.turn != GameBoard.WHITE) {
-//            ret = -ret;
-//        } else {
-//            ret = ret;
-//        }
-
-
-        //System.out.println("Ret: " + ret + " " + Integer.toString(numbers[0]) + " " + Integer.toString(numbers[1]) + "," + gb.turn + "\n");
 
 
         return ret;
@@ -115,7 +91,7 @@ public class NegaScout {
 
         ScoutRet t = negascout(gb, null, Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
         if(!t.moveList.isEmpty()){
-        System.out.println("Output from Negamax: " + t.score + " for square " + t.moveList.get(0).x + ":" + t.moveList.get(0).y);
+        //System.out.println("Output from Negamax: " + t.score + " for square " + t.moveList.get(0).x + ":" + t.moveList.get(0).y);
         } else {
             System.out.println("ERROR!");
             System.exit(0);
@@ -135,7 +111,7 @@ public class NegaScout {
 
     public static void playHuman() {
         NegaScout ns = new NegaScout();
-        GameBoard gb = new GameBoard(4);
+        GameBoard gb = new GameBoard(5);
         System.out.println(gb);
 
         Scanner s = new Scanner(System.in);

@@ -4,7 +4,10 @@
  */
 package gameai;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -12,6 +15,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -22,19 +27,38 @@ public class GameBoard {
     protected static final boolean WHITE = true;
     protected static final boolean BLACK = false;
     boolean turn = WHITE;
-    private int[] dirs;
     BitSet pieces;
     BitSet mask;
     int n;
 
     public GameBoard(int n) {
-        this.dirs = new int[]{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
 
         pieces = new BitSet(n);
         mask = new BitSet(n);
-        //pieces.set(0, n, false);
-        //mask.set(0, n, false);
+        pieces.set(0, n, false);
+        mask.set(0, n, false);
         this.n = n;
+    }
+
+    public GameBoard(int n, String boardString) {
+        this(n);
+
+        int loc;
+        for (loc = 0; loc < n * n; loc++) {
+            char t = boardString.charAt(loc);
+            if (t == '-') {
+            } else if (t == 'B') {
+                mask.set(loc);
+            } else if (t == 'W') {
+                mask.set(loc);
+                pieces.set(loc);
+            } else if (t == 'X') {
+                pieces.set(loc);
+            } else {
+                System.out.println("Error parsing boardString -- unidentified char:" + t);
+                System.exit(0);
+            }
+        }
     }
 
     public GameBoard(InputStream boardStream) {
@@ -117,16 +141,23 @@ public class GameBoard {
 
     public GameBoard executeMove(Move move) {
 
+        int x = move.x;
+        int y = move.y;
+
         GameBoard gb = (GameBoard) this.deepCopy();
 
-        int num = move.y * n + move.x;
+
+        int num = y * n + x;
+
 
         /* If the space is already taken, the move is invalid */
         if (gb.mask.get(num)) {
             throw new IllegalArgumentException();
         }
 
+
         /* implementing simple placement */
+
         if (turn == WHITE) {
             gb.setWhite(num);
         } else {
@@ -134,14 +165,19 @@ public class GameBoard {
         }
 
         if (move.jumpedSquare == Move.PLACE) {
+
             gb.turn = !turn;
+
         } else if (move.jumpedSquare != -1) {
+
             gb.setDead(move.jumpedSquare);
         }
 
         return gb;
     }
 
+    /* TODO: Is it best to return an integer list? 
+     * Is this the best algorithm to get moves? */
     /* O(size) */
     public List<Move> getPlaceMoves() {
         List<Move> moves = new ArrayList<Move>();
@@ -192,6 +228,8 @@ public class GameBoard {
     }
 
     public void enumerateJumpTree(Move m, GameBoard gb, List<Move> path, List<List<Move>> all_moves) {
+        //System.out.println("Enumerating Tree From: " + "\n");
+        //System.out.println(gb);
 
         List<Move> possibleMoves = gb.getSpaceJumps(m.x, m.y);
         if (possibleMoves.isEmpty()) {
@@ -202,6 +240,8 @@ public class GameBoard {
                 path_prime.add(m_prime);
                 all_moves.add(path_prime);
                 GameBoard gb_prime = gb.executeMove(m_prime);
+                //System.out.println("move in jump tree: " + m.x + ":" + m.y + "\n");
+                //System.out.println(gb);
                 enumerateJumpTree(m_prime, gb_prime, path_prime, all_moves);
             }
         }
@@ -253,7 +293,7 @@ public class GameBoard {
     }
 
     private List<Move> getSpaceJumps(int x, int y) {
-
+        int[] dirs = new int[]{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
 
         int num = y * n + x;
 
@@ -380,11 +420,42 @@ public class GameBoard {
     }
 
     public static void run(InputStream in) {
-        GameBoard gb = new GameBoard(in);
-        gb.turn = GameBoard.WHITE;
-        System.out.println("W " + gb.getPlaceMoves().size() + " " + gb.countJumpMoves());
-        gb.turn = GameBoard.BLACK;
-        System.out.println("B " + gb.getPlaceMoves().size() + " " + gb.countJumpMoves());
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String input;
+            StringBuilder boardStringBuilder = new StringBuilder();
+
+            int n = new Integer(br.readLine());
+            if (n <= 0) {
+                System.out.println("Input must begin with positive integer n");
+                System.exit(1);
+            }
+
+            int i = 0;
+            while ((input = br.readLine()) != null) {
+                boardStringBuilder.append(input.replace(" ", "").replace("\n", ""));
+                i++;
+            }
+            if (i != n) {
+                System.out.println("Must supply n rows of gameboard");
+                System.exit(1);
+            }
+
+            String boardString = boardStringBuilder.toString();
+            if (boardString.length() != n * n) {
+                System.out.println("Row of incorrect length supplied");
+                System.exit(1);
+            }
+
+
+            GameBoard gb = new GameBoard(n,boardString);
+            gb.turn = GameBoard.WHITE;
+            System.out.println("W " + gb.countPlaceMoves() + " " + gb.countJumpMoves());
+            gb.turn = GameBoard.BLACK;
+            System.out.println("B " + gb.countPlaceMoves() + " " + gb.countJumpMoves());
+        } catch (IOException ex) {
+            Logger.getLogger(GameBoard.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public static void main(String[] args) {

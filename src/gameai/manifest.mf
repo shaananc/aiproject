@@ -1,0 +1,4 @@
+Mitchell Brunton - mbrunton
+Shaanan Cohney   - sncohney
+
+Main-Class: gameai.PartA

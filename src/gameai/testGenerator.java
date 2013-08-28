@@ -6,6 +6,7 @@ package gameai;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -22,26 +23,56 @@ public class testGenerator {
 
     public static void main(String[] args) {
         PrintStream stdout = System.out;
-        try {
-            System.setOut(new PrintStream("tests/out.txt"));
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(testGenerator.class.getName()).log(Level.SEVERE, null, ex);
-        }
         
-        for (int i = 0; i < 100; i = i + 1) {
+        long totalTimeM = 0;
+        long totalTimeS = 0;
+
+         
+        
+        int trials = 1000;
+        
+        for (int i = 0; i < trials; i = i + 1) {
             GameBoard gb = generateBoard(6);
-            
+
             try {
-                PrintWriter out = new PrintWriter(new FileWriter("tests/board"+i+".txt"));
-                out.write("6\n"+gb.toString());
+                PrintWriter out = new PrintWriter(new FileWriter("tests/board" + i + ".txt"));
+                out.write("6\n" + gb.toString());
                 out.close();
             } catch (IOException ex) {
                 Logger.getLogger(testGenerator.class.getName()).log(Level.SEVERE, null, ex);
             }
+
+            try {
+                System.setOut(new PrintStream(new FileOutputStream("tests/outShaanan.txt", true)));
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(testGenerator.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            final long startTimeS = System.nanoTime();
+            GameBoard.run(new ByteArrayInputStream(("6\n" + gb.toString()).getBytes()));
+            final long endTimeS = System.nanoTime();
             
-            GameBoard.run(new ByteArrayInputStream(("6\n"+gb.toString()).getBytes()));
+            totalTimeS += endTimeS-startTimeS;
+            
+            PartA parta = new PartA();
+
+            try {
+                System.setOut(new PrintStream(new FileOutputStream("tests/outMitch.txt", true)));
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(testGenerator.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            final long startTimeM = System.nanoTime();
+            parta.run(new ByteArrayInputStream(("6\n" + gb.toString()).getBytes()));
+            final long endTimeM = System.nanoTime();
+            totalTimeM += endTimeM-startTimeM;
+
         }
         System.setOut(stdout);
+        
+        System.out.println("Average Time for Shaanan: " + totalTimeS/(10e9*trials));
+        System.out.println("Average Time for Mitch: " + totalTimeM/(10e9*trials));
+        
     }
 
     public static GameBoard generateBoard(int n) {

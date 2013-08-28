@@ -1,9 +1,12 @@
 Mitchell Brunton - mbrunton
 Shaanan Cohney   - sncohney
 
+Overall time complexity (overestimate):
+O(n^2 * 8^(n^2/4))
+
 For part A of this project, we decided to implement our own, separate
 ideas for solving the problem of counting the number of legal place/
-jump moves for both players. The reasons for this were two-fold:
+jump moves for a game of Jumper. The reasons for this were two-fold:
 firstly, having two different programs which produced the same
 output for a variety of inputs would increase our confidence that our
 solutions were correct, and secondly, we both had different ideas as
@@ -25,7 +28,7 @@ countJumpMovesFromPos method to a running tally. countJumpMovesFromPos
 takes a Gameboard, and a Pos as arguments. It first creates an
 ArrayList of NeighbourPairs, which holds (neighbour, neighbour's neighbour)
 pairs, such that a piece situated on the current position might jump over
-a neighbour onto that neighbour's neighbour.
+a neighbour onto the neighbour's neighbour.
 For example, if the following Gameboard was passed to countJumpMovesFromPos
 with position '*':
 
@@ -40,15 +43,38 @@ and (1 + countJumpMovesFromPos(child board, neighbour's neighbour's pos)) is
 added to a running tally.
 
 The worst-case complexity of countJumpMovesFromPos is difficult to state
-precisely, however a (drastic) overestimate of XXX can be achieved
-as follows: countJumpMoves scans each of the n*n cells, and for each cell, a 
-recursive call is made to countJumpMovesFromPos. Each countJumpMovesFromPos call
-can make a maximum of 8 more calls to the same function, and does a constant
-amount of work. If we imagine a cell in the centre of the board, and it makes 8
-calls to countJumpMovesFromPos for each of the 8 possible jump moves from that
-location, and then each of those calls make 8 subsequent calls, this process
-could theoretically continue until... 
+precisely, however an overestimate is as follows:
+Each countJumpMovesFromPos can make a maximum of 8 more calls to 
+countJumpMovesFromPos, and a single path of recursive calls could not exceed
+the maximum depth of ( n/2 )^2 - 1, which is obtained by considering that each
+jump move moves exactly 2 squares, which means that a compound jump can visit
+at most n/2 squares on half of the rows, and 0 squares on the other half,
+minus 1 for the starting square. 
+So the tree of recursive function calls has a maximum branching 
+factor of 8, and a maximum depth of of ( n/2 )^2 - 1, and because each call
+to countJumpMovesFromPos does a constant amount of work, this leads to a complexity
+of O( 8^(n^2/4) ). Thus the complexity of countJumpMoves countMoves algorithm
+is O(n^2 * 8^(n^2/4)), as is the complexity of the countMoves function, since
+O(n^2 * 8^(n^2/4) + n^2) = O(n^2 * 8^(n^2/4)). In practice, this will be much
+lower, as very few pieces will ever be able to make 8 jumps from a given
+position, and the average depth of compound jumps will be significantly
+lower than the theoretical maximum.
+
 
 -- Shaanan's code --
 
+
 -- Comparison --
+The complexity of any algorithm which counts the number of legal jump moves
+will be dominated in the search for compound jumps. As it happened, we both
+implemented a similar, recursive definition for solving this problem. We ran
+a series of time trials in which each implementation was timed in counting 
+the number of moves for a number of random board configurations, ranging from
+200 boards to 1000 boards. To our surprise, both programs took almost exactly
+the same amount of time to complete all tasks.
+
+
+
+
+
+

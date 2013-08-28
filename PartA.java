@@ -3,10 +3,8 @@
 */
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.UnsupportedEncodingException;
-import java.util.Scanner;
+import java.io.InputStreamReader;
+import java.io.IOException;
 
 /* Entry point to Part A of CS "Jumper" project. A file is provided via standard input, which
    consists of an ascii representation of a Jumper gameboard, mid-play. Assuming the board is
@@ -16,46 +14,54 @@ import java.util.Scanner;
 
 public class PartA {
 
-	public static void main(String[] args) throws FileNotFoundException, UnsupportedEncodingException {
+	public static void main(String[] args) throws NumberFormatException, IOException {
 		
-		if (args.length != 1) {
-			System.out.println("usage: java PartA input_file");
-			System.exit(1);
-		}
-		
-		Scanner in = new Scanner(new BufferedReader(new FileReader(args[0])));
-		int n = 0;
-		try {
-			n = in.nextInt();
-            if (n <= 0) {
-                throw new Exception();
-            }
-		} catch (Exception e) {
-			System.out.println("Error: input file must begin with positive integer representing gameboard side length");
-			System.exit(1);
-		}
-		
-		StringBuilder boardStringBuilder = new StringBuilder();
-		while (in.hasNext()) {
-			boardStringBuilder.append(in.next());
-		}
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            String input;
+            StringBuilder boardStringBuilder = new StringBuilder();
 
-		String boardString = boardStringBuilder.toString();
-		Gameboard gb = new Gameboard(n, boardString);
-		MoveCounter mc = new MoveCounter(n);
-		int numWPlaceMoves = mc.countPlaceMoves(gb);
-		int numWJumpMoves = mc.countJumpMoves(gb, Cell.State.W);
-		int numBPlaceMoves = mc.countPlaceMoves(gb);
-		int numBJumpMoves = mc.countJumpMoves(gb, Cell.State.B);
+            int n = new Integer(br.readLine());
+            if (n <= 0) {
+                System.out.println("Input must begin with positive integer n");
+                System.exit(1);
+            }
+
+            int i = 0;
+            while ( (input = br.readLine()) != null) {
+                boardStringBuilder.append(input.replace(" ", "").replace("\n", ""));
+                i++;
+            }
+            if (i != n) {
+                System.out.println("Must supply n rows of gameboard");
+                System.exit(1);
+            }
+
+            String boardString = boardStringBuilder.toString();
+            if (boardString.length() != n*n) {
+                System.out.println("Row of incorrect length supplied");
+                System.exit(1);
+            }
+
+            Gameboard gb = new Gameboard(n, boardString);
+            MoveCounter mc = new MoveCounter(n);
+
+            int numWPlaceMoves = mc.countPlaceMoves(gb);
+            int numWJumpMoves = mc.countJumpMoves(gb, Cell.State.W);
+            int numBPlaceMoves = mc.countPlaceMoves(gb);
+            int numBJumpMoves = mc.countJumpMoves(gb, Cell.State.B);
+            
+            System.out.println("W " + numWPlaceMoves + " " + numWJumpMoves);
+            System.out.println("B " + numBPlaceMoves + " " + numBJumpMoves);
 		
-		System.out.println("W " + numWPlaceMoves + " " + numWJumpMoves);
-		System.out.println("B " + numBPlaceMoves + " " + numBJumpMoves);
-		
-		return;
+        } catch (IOException e) {
+            System.out.println("An IO Exception occurred. Input must be of form:\nn\nrow 0\n...\nrow n");
+            System.exit(1);
+        }
 	}
 	
 	// just testing and debugging...
-	public static void tests() throws FileNotFoundException {
+	public static void tests() {
 		int n;
 		MoveCounter mc;
 		String boardString;

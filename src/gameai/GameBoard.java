@@ -32,15 +32,14 @@ public class GameBoard {
 
         pieces = new BitSet(n);
         mask = new BitSet(n);
-        pieces.set(0, n, false);
-        mask.set(0, n, false);
+        //pieces.set(0, n, false);
+        //mask.set(0, n, false);
         this.n = n;
     }
 
     public GameBoard(InputStream boardStream) {
         Scanner s = new Scanner(boardStream);
         n = s.nextInt();
-        dirs = new int[]{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
 
         pieces = new BitSet(n);
         mask = new BitSet(n);
@@ -118,23 +117,16 @@ public class GameBoard {
 
     public GameBoard executeMove(Move move) {
 
-        int x = move.x;
-        int y = move.y;
-
         GameBoard gb = (GameBoard) this.deepCopy();
 
-
-        int num = y * n + x;
-
+        int num = move.y * n + move.x;
 
         /* If the space is already taken, the move is invalid */
         if (gb.mask.get(num)) {
             throw new IllegalArgumentException();
         }
 
-
         /* implementing simple placement */
-
         if (turn == WHITE) {
             gb.setWhite(num);
         } else {
@@ -142,19 +134,14 @@ public class GameBoard {
         }
 
         if (move.jumpedSquare == Move.PLACE) {
-
             gb.turn = !turn;
-
         } else if (move.jumpedSquare != -1) {
-
             gb.setDead(move.jumpedSquare);
         }
 
         return gb;
     }
 
-    /* TODO: Is it best to return an integer list? 
-     * Is this the best algorithm to get moves? */
     /* O(size) */
     public List<Move> getPlaceMoves() {
         List<Move> moves = new ArrayList<Move>();
@@ -174,7 +161,7 @@ public class GameBoard {
 
     public int countPlaceMoves() {
         int count = 0;
-        for (int loc = 0; loc < n; loc += 1) {
+        for (int loc = 0; loc < n*n; loc += 1) {
             if (isEmpty(loc)) {
                 count += 1;
             }
@@ -205,8 +192,6 @@ public class GameBoard {
     }
 
     public void enumerateJumpTree(Move m, GameBoard gb, List<Move> path, List<List<Move>> all_moves) {
-        //System.out.println("Enumerating Tree From: " + "\n");
-        //System.out.println(gb);
 
         List<Move> possibleMoves = gb.getSpaceJumps(m.x, m.y);
         if (possibleMoves.isEmpty()) {
@@ -217,8 +202,6 @@ public class GameBoard {
                 path_prime.add(m_prime);
                 all_moves.add(path_prime);
                 GameBoard gb_prime = gb.executeMove(m_prime);
-                //System.out.println("move in jump tree: " + m.x + ":" + m.y + "\n");
-                //System.out.println(gb);
                 enumerateJumpTree(m_prime, gb_prime, path_prime, all_moves);
             }
         }

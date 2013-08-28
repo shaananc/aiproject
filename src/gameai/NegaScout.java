@@ -13,7 +13,7 @@ import java.util.Scanner;
  */
 public class NegaScout {
 
-    int maxdepth = 3;
+    int maxdepth = 9;
 
     int Evaluate(GameBoard gb, List<Move> m) {
 

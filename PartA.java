@@ -23,24 +23,16 @@ public class PartA {
 
             int n = new Integer(br.readLine());
             if (n <= 0) {
-                System.out.println("Input must begin with positive integer n");
-                System.exit(1);
+                throw new NumberFormatException();
             }
 
-            int i = 0;
             while ( (input = br.readLine()) != null) {
                 boardStringBuilder.append(input.replace(" ", "").replace("\n", ""));
-                i++;
-            }
-            if (i != n) {
-                System.out.println("Must supply n rows of gameboard");
-                System.exit(1);
             }
 
             String boardString = boardStringBuilder.toString();
             if (boardString.length() != n*n) {
-                System.out.println("Row of incorrect length supplied");
-                System.exit(1);
+                throw new InvalidBoardStringException();
             }
 
             Gameboard gb = new Gameboard(n, boardString);
@@ -55,7 +47,15 @@ public class PartA {
             System.out.println("B " + numBPlaceMoves + " " + numBJumpMoves);
 		
         } catch (IOException e) {
-            System.out.println("An IO Exception occurred. Input must be of form:\nn\nrow 0\n...\nrow n");
+            System.out.println("An IO Exception occurred. Aborting...");
+            System.exit(1);
+        } catch (NumberFormatException e) {
+            System.out.println("The first line of input must be a positive integer, n, " +
+                                "representing board side length");
+            System.exit(1);
+        } catch (InvalidBoardStringException e) {
+            System.out.println("Supplied board string must contain n rows, with each row " +
+                                "containing n cell states. Possible states = {'-', 'B', 'W', 'E'}");
             System.exit(1);
         }
 	}

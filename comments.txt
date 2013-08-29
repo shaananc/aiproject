@@ -62,6 +62,20 @@ lower than the theoretical maximum.
 
 
 -- Shaanan's code --
+Shaanan's code uses BitSets to try to minimise the amount of memory that the
+board representation consumes.
+Per square, it takes 2 bits to represent all 4 combinations, leading to a board state
+that takes 2n^2+17 bits of memory including an integer boardsize and boolean turn variable.
+A move is currently suboptimal, requiring 48 bits of memory, three 16 bit integers,
+representing (x,y) and the 'jump' status of a given move. As a result of the bitwise
+representation, a good number of helper function were written to test the state of a given
+square. This makes the code fairly readable as the method names are quite descriptive.
+Currently, executing a move returns a new GameBoard object, and one might assume this would be
+the largest source of memory usage. However, on using the profiler, it seems that the
+Move objects take even more space given that there are O(n^2) of them for each board state.
+Move objects are generated when calculating the number of jumps to be made in order to count
+the number of sub-compound-jumps via a modified version of DFS. The analysis follows as above,
+given that the idea of the algorithms is near identical, varying only in implementation.
 
 
 -- Comparison --
@@ -71,10 +85,7 @@ implemented a similar, recursive definition for solving this problem. We ran
 a series of time trials in which each implementation was timed in counting 
 the number of moves for a number of random board configurations, ranging from
 200 boards to 1000 boards. To our surprise, both programs took almost exactly
-the same amount of time to complete all tasks.
-
-
-
-
+the same amount of time to complete all tasks. For this assessment, we chose
+to submit Mitchell's implementation.
 
 

@@ -5,14 +5,18 @@
 public class MitchReferee implements Piece {
     
     public static void main(String[] args) {
-    	//botvsbot();
-    	humanvsbot(); 
+    	botvsbot();
+    	//humanvsbot(); 
     }
     
     public static void botvsbot() {
     	Mbrunton bot1 = new Mbrunton();
     	Mbrunton bot2 = new Mbrunton();
+    	
+    	final long startTime = System.currentTimeMillis();
     	playgame(bot1, bot2);
+    	final long endTime = System.currentTimeMillis();
+    	System.out.println("Execution time: " + (endTime - startTime));
     }
     
     public static void humanvsbot() {
@@ -21,10 +25,11 @@ public class MitchReferee implements Piece {
     	playgame(human, bot);
     }
     
-    public static void playgame(Mbrunton p1, Mbrunton p2) {
+    public static int playgame(Mbrunton p1, Mbrunton p2) {
     	int n = 6;
-        p1.init(n, WHITE);
-        p2.init(n,  BLACK);
+        p1.init(n, WHITE, new MinimaxAlphaBetaMoveFinder(n, WHITE, 6));
+        p2.init(n, BLACK, new MinimaxAlphaBetaMoveFinder(n, BLACK, 6));
+        
         System.out.println("Original board:");
         p1.printBoard(System.out);
         
@@ -60,5 +65,7 @@ public class MitchReferee implements Piece {
         	System.out.println("Invalid game...");
         	break;
         }
+        
+        return finalState;
     }
 }

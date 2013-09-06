@@ -1,26 +1,8 @@
 
 
 public class MinimaxMoveFinder extends MoveFinder {
-
-	public static final int MAX_DEPTH = 3;
-	// TODO: discuss whether MAX_DEPTH should be strictly even
 	
-	// TODO: prune search space with alpha-beta
-	
-	// TODO: consider pruning further by only considering longest jump moves
-	// from a certain pos (or similar) since otherwise we could have jump {a,b}
-	// and jump {a,b,c} as children from n1, then {c} as a child of {a,b} - almost
-	// repeating ourselves (modulo opponent's sandwiched move)
-	
-	// TODO consider:
-	// cache of grandchildren of most recent root-child,
-	// since next call to getMove will feature one of
-	// their gbs
-	
-	// TODO consider:
-	// not explicitly returning int from maxi/mini functions
-	// but rather just setting node utility values (maybe less
-	// readable though
+	public static final int MAX_DEPTH = 6;
 	
 	public MinimaxMoveFinder(int n, int player) {
 		super(n, player);
@@ -54,10 +36,11 @@ public class MinimaxMoveFinder extends MoveFinder {
 		}
 		
 		// generate jump nodes first, and if there are none then look to place nodes
-		node.getChildJumpNodes();
+		/*node.getChildJumpNodes();
 		if (node.childNodes.size() == 0) {
 			node.getChildPlaceNodes();
-		}
+		}*/
+		node.getChildNodes();
 		int bestUtility = Integer.MIN_VALUE;
 		
 		// for each child, find it's utility
@@ -81,10 +64,11 @@ public class MinimaxMoveFinder extends MoveFinder {
 		}
 		
 		// for each child, find it's utility
-		node.getChildJumpNodes();
+		/*node.getChildJumpNodes();
 		if (node.childNodes.size() == 0) {
 			node.getChildPlaceNodes();
-		}
+		}*/
+		node.getChildNodes();
 		int worstUtility = Integer.MAX_VALUE;
 		
 		for (Node childNode : node.childNodes) {

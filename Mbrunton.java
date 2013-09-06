@@ -23,8 +23,8 @@ public class Mbrunton implements Player, Piece {
         gb = new Gameboard(n);
         player = p;
         illegalOpponentMoveFlag = false;
-        moveFinder = new MinimaxMoveFinder(gb.n, player);
-    	//moveFinder = new StupidMoveFinder(gb.n, player);
+        moveFinder = new MinimaxAlphaBetaMoveFinder(n, p);
+        
         return SUCCESS;
     }
     
@@ -37,7 +37,20 @@ public class Mbrunton implements Player, Piece {
     	gb = new Gameboard(n, boardString);
     	player = p;
     	illegalOpponentMoveFlag = false;
-    	moveFinder = new MinimaxMoveFinder(gb.n, player);
+    	moveFinder = new MinimaxAlphaBetaMoveFinder(gb.n, player);
+    	return SUCCESS;
+    }
+    
+    /* for comparing different MoveFinders */
+    public int init(int n, int p, MoveFinder moveFinder) {
+    	if (n <= 0 || (p != WHITE && p != BLACK)) {
+            return FAILURE;
+        }
+    	
+    	gb = new Gameboard(n);
+    	player = p;
+    	illegalOpponentMoveFlag = false;
+    	this.moveFinder = moveFinder;
     	return SUCCESS;
     }
 

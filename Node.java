@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /* Node for game trees
  * Keeps track of game state, and sequence of moves which
@@ -46,8 +48,19 @@ public class Node implements Piece {
 	
 	// generate all child nodes for some parent node
 	public void getChildNodes() {
+		getChildJumpNodes();
 		getChildPlaceNodes();
-		getChildJumpNodes();		
+	}
+	
+	// get child nodes, but order them based on whether we want
+	// best nodes first, or worst
+	public void getChildNodes(boolean bestFirst) {
+		getChildNodes();
+		if (bestFirst) {
+			Collections.sort(childNodes, COMPARE_BEST_FIRST);
+		} else {
+			Collections.sort(childNodes, COMPARE_WORST_FIRST);
+		}
 	}
 	
 	// generate child nodes from node corresponding to place moves
@@ -86,28 +99,9 @@ public class Node implements Piece {
 		}
 	}
 	
-	// TODO
 	public void getChildJumpNodesFromPos(Gameboard newBoard, int i, int j, ArrayList<Integer> rowList, ArrayList<Integer> colList) {
-
-		// DEBUGGING
-		/*
-		System.out.println("Inside getChildJumpNodesFromPos...");
-		System.out.println("newBoard:\n" + newBoard);
-		System.out.println("(i, j) = (" + i + ", " + j + ")");
-		System.out.println("rowList:\n" + rowList);
-		System.out.println("colList:\n" + colList);
-		*/
 		
 		ArrayList<NeighbourPair> neighbourPairs = newBoard.getNeighbourPairs(i, j);
-		
-		// DEBUGGING
-		/*
-		System.out.println("neighbourPairs:");
-		for (NeighbourPair pair : neighbourPairs) {
-			System.out.println("(ni, nj) = (" + pair.ni + ", " + pair.nj + ")");
-			System.out.println("(nni, nnj) = (" + pair.nni + ", " + pair.nnj + ")");
-		}
-		*/
 		
 		for (NeighbourPair pair : neighbourPairs) {
 			int neighbour = newBoard.board[pair.ni * gb.n + pair.nj];
@@ -141,6 +135,23 @@ public class Node implements Piece {
 		
 		return new Move(whosTurn, isPlaceMove, rowPositions, colPositions);
 	}
+	
+	// assume longest move is best
+	public static Comparator<Node> COMPARE_BEST_FIRST = new Comparator<Node>() {
+		public int compare(Node node1, Node node2) {
+			Integer len1 = new Integer(node1.lastMove.RowPositions.length);
+			Integer len2 = new Integer(node2.lastMove.RowPositions.length);
+			return len1.compareTo(len2);
+		}
+	};
+	
+	public static Comparator<Node> COMPARE_WORST_FIRST = new Comparator<Node>() {
+		public int compare(Node node1, Node node2) {
+			Integer len1 = new Integer( - node1.lastMove.RowPositions.length);
+			Integer len2 = new Integer( - node2.lastMove.RowPositions.length);
+			return len1.compareTo(len2);
+		}
+	};
 	
 	public String toString() {
 		StringBuffer nodeBuffer = new StringBuffer();

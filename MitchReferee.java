@@ -1,5 +1,3 @@
-import csproj.jumper.*;
-
 /* my implementation of referee class for jumper game
    until one provided by tutor makes an appearance
 */
@@ -7,45 +5,60 @@ import csproj.jumper.*;
 public class MitchReferee implements Piece {
     
     public static void main(String[] args) {
-        Mbrunton bot = new Mbrunton();
-        HumanPlayer human = new HumanPlayer();
-        
-        int n = 6;
-        bot.init(n, WHITE);
-        human.init(n,  BLACK);
+    	//botvsbot();
+    	humanvsbot(); 
+    }
+    
+    public static void botvsbot() {
+    	Mbrunton bot1 = new Mbrunton();
+    	Mbrunton bot2 = new Mbrunton();
+    	playgame(bot1, bot2);
+    }
+    
+    public static void humanvsbot() {
+    	HumanPlayer human = new HumanPlayer();
+    	Mbrunton bot = new Mbrunton();
+    	playgame(human, bot);
+    }
+    
+    public static void playgame(Mbrunton p1, Mbrunton p2) {
+    	int n = 6;
+        p1.init(n, WHITE);
+        p2.init(n,  BLACK);
         System.out.println("Original board:");
-        bot.printBoard(System.out);
+        p1.printBoard(System.out);
         
-        while (bot.getWinner() == EMPTY) {
-            Move botMove = bot.makeMove();
-            System.out.println("After bot's move:");
-            bot.printBoard(System.out);
-            if (bot.getWinner() != EMPTY) {
-                break;
-            }
-            
-            human.opponentMove(botMove);
-            Move humanMove = human.makeMove();
-            System.out.println("After human's move: ");
-            human.printBoard(System.out);
-            bot.opponentMove(humanMove);
+        while (p1.getWinner() == EMPTY) {
+        	Move p1Move = p1.makeMove();
+        	System.out.println("After player 1's move:");
+        	p1.printBoard(System.out);
+        	if (p1.getWinner() != EMPTY) {
+        		break;
+        	}
+        	
+        	p2.opponentMove(p1Move);
+        	Move p2Move = p2.makeMove();
+        	System.out.println("After player 2's move: ");
+        	p2.printBoard(System.out);
+        	p1.opponentMove(p2Move);
         }
-
-        int finalState = bot.getWinner();
+        
+        int finalState = p1.getWinner();
         switch (finalState) {
-        case BLACK:
-            System.out.println("BLACK WINS!");
-            break;
+        
         case WHITE:
-            System.out.println("WHITE WINS!");
-            break;
+        	System.out.println("PLAYER 1 (WHITE) WINS!");
+        	break;
+        case BLACK:
+        	System.out.println("PLAYER 2 (BLACK) WINS!");
+        	break;
         case DEAD:
-            System.out.println("DRAW");
-            break;
+        	System.out.println("DRAW");
+        	break;
         case INVALID:
-            System.out.println("Someone was very very cheeky and made an illegal move!");
-            System.out.println("Invalid game...");
-            break;
+        	System.out.println("Someone was very very cheeky and made an illegal move!");
+        	System.out.println("Invalid game...");
+        	break;
         }
     }
 }

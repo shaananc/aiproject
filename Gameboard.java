@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import csproj.jumper.*;
 
 /* Mitchell Brunton - mbrunton
    Shaanan Cohney   - sncohney
@@ -84,11 +83,16 @@ public class Gameboard implements Piece {
 		
 		int i = m.RowPositions[0];
 		int j = m.ColPositions[0];
+		
+		if (i < 0 || i >= n || j < 0 || j >= n) {
+			return false;
+		}
+		
 		return board[i*n + j] == EMPTY;
 	}
 	
 	public boolean isLegalJumpMove(Move m) {
-		// TODO: consider merging with applyMove, and undoing Move m if it's found to be illegal
+
 		// create a scrap board to test move on
 		Gameboard testBoard = newInstance(this);
 
@@ -102,11 +106,17 @@ public class Gameboard implements Piece {
 		if (testBoard.board[i * n + j] != m.P){
 			return false;
 		}
+		if (i < 0 || i >= n || j < 0 || j >= n) {
+			return false;
+		}
 		
 		// always considering single jump from (i,j) to (next_i,next_j), over (jumped_i,jumped_j)		
 		for (int k = 1; k < len; k++) {
 			int next_i = m.RowPositions[k];
 			int next_j = m.ColPositions[k];
+			if (next_i < 0 || next_i >= n || next_j < 0 || next_j >= n) {
+				return false;
+			}
 			// next cell must be 0 or 2 rows/cols away
 			if (Math.abs(next_i - i) != 2 && Math.abs(next_i - i) != 0) {
 				return false;
@@ -144,11 +154,12 @@ public class Gameboard implements Piece {
 		int j = m.ColPositions[0];
 		if (m.IsPlaceMove) {
 			board[i * n + j] = m.P;
-		} else {
+		} else {	
 			int len = m.RowPositions.length;
 			for (int k = 1; k < len; k++) {
-				int next_i = m.RowPositions[i];
-				int next_j = m.ColPositions[j];
+				
+				int next_i = m.RowPositions[k];
+				int next_j = m.ColPositions[k];
 				int jumped_i = i + (next_i - i)/2;
 				int jumped_j = j + (next_j - j)/2;
 				if (board[jumped_i * n + jumped_j] != m.P) {

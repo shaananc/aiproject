@@ -1,4 +1,3 @@
-import csproj.jumper.*;
 
 /* As dumb as they come... finds moves by scanning
  * Gameboard for next possible place move

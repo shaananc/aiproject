@@ -2,7 +2,7 @@ import java.io.PrintStream;
 
 /* Implementation of Player interface */
 
-import csproj.jumper.*;
+//import csproj.jumper.*
 
 public class Mbrunton implements Player, Piece {
     Gameboard gb;
@@ -23,18 +23,37 @@ public class Mbrunton implements Player, Piece {
         gb = new Gameboard(n);
         player = p;
         illegalOpponentMoveFlag = false;
-        
-        // TODO: fix bug(s) in MinimaxMoveFinder
-        //moveFinder = new MinimaxMoveFinder(gb.n, player);
-        moveFinder = new StupidMoveFinder(gb.n, player);
+        moveFinder = new MinimaxMoveFinder(gb.n, player);
+    	//moveFinder = new StupidMoveFinder(gb.n, player);
         return SUCCESS;
+    }
+    
+    /* just for debugging purposes */
+    public int init(int n, int p, String boardString) {
+    	if (n <= 0 || (p != WHITE && p != BLACK)) {
+            return FAILURE;
+        }
+    	
+    	gb = new Gameboard(n, boardString);
+    	player = p;
+    	illegalOpponentMoveFlag = false;
+    	moveFinder = new MinimaxMoveFinder(gb.n, player);
+    	return SUCCESS;
     }
 
     /* Decide on a move to make, apply it to Gameboard, and
      * return Move object
      */
     public Move makeMove() {
-        return moveFinder.getMove(gb);
+    	Move m = moveFinder.getMove(gb);
+    	
+    	// DEBUGGING
+    	if (!gb.isLegalMove(m)) {
+    		System.out.println("Warning, about to self-apply illegal move:");
+    	}
+    	
+    	gb.applyMove(m);
+    	return m;
     }
 
     /* check if opponent's move is legal, and if so apply it to Gameboard,
@@ -42,13 +61,13 @@ public class Mbrunton implements Player, Piece {
      */
     public int opponentMove(Move m) {
 
-        if (gb.isLegalMove(m)) {
-            gb.applyMove(m);
-            return SUCCESS;
-        } else {
-            illegalOpponentMoveFlag = true;
-            return FAILURE;
-        }
+    	if (gb.isLegalMove(m)) {
+    		gb.applyMove(m);
+    		return SUCCESS;
+    	} else {
+    		illegalOpponentMoveFlag = true;
+    		return FAILURE;
+    	}
     }
 
     /* return state of gameplay - if opponent has made illegal move, return
@@ -56,18 +75,18 @@ public class Mbrunton implements Player, Piece {
      * or unfinished game
      */
     public int getWinner() {
-        if (illegalOpponentMoveFlag) {
-            return INVALID;
-        } else {
-            return gb.getWinner();
-        }
+    	if (illegalOpponentMoveFlag) {
+    		return INVALID;
+    	} else {
+    		return gb.getWinner();
+    	}
     }
 
     /* print string representation of Gameboard to desired
      * output stream
      */
     public void printBoard(PrintStream output) {
-        output.println(gb.toString());
+    	output.println(gb.toString());
     }
 }
 

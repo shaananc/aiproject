@@ -1,4 +1,3 @@
-import csproj.jumper.*;
 
 public abstract class BoardEvaluator implements Piece {
 	// TODO: experiment with making "evaluate" a function of depth - smaller depth = higher utility

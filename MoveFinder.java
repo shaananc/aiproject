@@ -1,4 +1,4 @@
-import csproj.jumper.*;
+
 
 public abstract class MoveFinder implements Piece {
 	int n;

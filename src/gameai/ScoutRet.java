@@ -13,15 +13,15 @@ import java.util.List;
  */
 public class ScoutRet {
     int score;
-    List<Move> moveList;
+    List<InternalMove> moveList;
     
-    public ScoutRet(int score, List<Move> moveList){
+    public ScoutRet(int score, List<InternalMove> moveList){
         this.score = score;
         this.moveList = moveList;
     }
     
     public ScoutRet(){
-        this.moveList = new ArrayList<Move>();
+        this.moveList = new ArrayList<InternalMove>();
         
     }
 }

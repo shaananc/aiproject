@@ -55,7 +55,10 @@ public class GameBoardTest {
     }
     
     @Test
-    public void testNumPlaces(){
-        
+    public void testExecuteMove(){
+        GameBoard gb = new GameBoard(6);
+        gb = gb.executeMove(new InternalMove(1,1));
+        gb = gb.executeMove(new InternalMove(2,2));
+        System.out.println(gb);
     }
 }

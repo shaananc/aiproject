@@ -4,6 +4,8 @@
  */
 package gameai;
 
+import java.io.PrintStream;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -11,11 +13,16 @@ import java.util.Scanner;
  *
  * @author SHAANAN
  */
-public class NegaScout {
+public class NegaScout implements Player, Piece {
 
-    int maxdepth = 3;
+    int maxdepth = 6;
+    GameBoard state;
+    int playerId;
 
-    int Evaluate(GameBoard gb, List<Move> m) {
+    public NegaScout() {
+    }
+
+    int Evaluate(GameBoard gb, List<InternalMove> m) {
 
         //System.out.println("evaluating:");
         //System.out.println(gb);
@@ -28,7 +35,7 @@ public class NegaScout {
     }
 
     // TODO - evaluate use of depth.
-    public ScoutRet negascout(GameBoard gb, List<Move> p, int alpha, int beta, int d) {
+    public ScoutRet negascout(GameBoard gb, List<InternalMove> p, int alpha, int beta, int d) {
         int b, i;
         ScoutRet t = new ScoutRet();
         ScoutRet a = new ScoutRet();
@@ -40,10 +47,10 @@ public class NegaScout {
 
 
         if (d == maxdepth || gb.isOver()) {
-            return new ScoutRet(Evaluate(gb, p),p);
+            return new ScoutRet(Evaluate(gb, p), p);
         }
 
-        List<List<Move>> successors = gb.getMoves();
+        List<List<InternalMove>> successors = gb.getMoves();
 
 
 
@@ -51,7 +58,7 @@ public class NegaScout {
         b = beta;
 
         i = 1;
-        for (List<Move> moveList : successors) {
+        for (List<InternalMove> moveList : successors) {
             t = negascout(gb.executeCompound(moveList), moveList, -b, -a.score, d + 1);
             t.score = -t.score;
             t.moveList = moveList;
@@ -87,11 +94,11 @@ public class NegaScout {
 
     }
 
-    public List<Move> chooseMove(GameBoard gb) {
+    public List<InternalMove> chooseMove(GameBoard gb) {
 
         ScoutRet t = negascout(gb, null, Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
-        if(!t.moveList.isEmpty()){
-        //System.out.println("Output from Negamax: " + t.score + " for square " + t.moveList.get(0).x + ":" + t.moveList.get(0).y);
+        if (!t.moveList.isEmpty()) {
+            //System.out.println("Output from Negamax: " + t.score + " for square " + t.moveList.get(0).x + ":" + t.moveList.get(0).y);
         } else {
             System.out.println("ERROR!");
             System.exit(0);
@@ -126,19 +133,110 @@ public class NegaScout {
             System.out.println();
 
 
-            Move m = new Move(x, y);
+            InternalMove m = new InternalMove(x, y);
             gb = gb.executeMove(m);
             System.out.println(gb);
             if (gb.isOver()) {
                 break;
             }
 
-            List<Move> e = ns.chooseMove(gb);
+            List<InternalMove> e = ns.chooseMove(gb);
             gb = gb.executeCompound(e);
             System.out.println(gb);
         }
 
 
 
+    }
+
+    @Override
+    public int getWinner() {
+        if (!state.isOver()) {
+            return 0;
+        }
+        int[] n = state.getNumbers();
+        if (n[0] > n[1]) {
+            return 1;
+        } else if (n[1] < n[0]) {
+            return 0;
+        } else {
+            return 3;
+        }
+    }
+
+    @Override
+    public int init(int n, int p) {
+        state = new GameBoard(n);
+        //state.turn = GameBoard.WHITE;
+        playerId = p;
+
+        return 1;
+    }
+
+    @Override
+    public Move makeMove() {
+        List<InternalMove> moves = chooseMove(state);
+
+        Move refMove = new Move();
+
+        int rows[];
+        int cols[];
+        int i = 0;
+
+        if (moves.size() == 1 && moves.get(0).jumpedSquare == -2) {
+            refMove.IsPlaceMove = true;
+            rows = new int[1];
+            cols = new int[1];
+        } else {
+            rows = new int[moves.size() + 1];
+            cols = new int[moves.size() + 1];
+
+            refMove.IsPlaceMove = false;
+            // calculate first square
+            InternalMove m0 = moves.get(0);
+            int signy = (m0.jumpedSquare / state.n < m0.y) ? -1 : 1;
+            int signx = (m0.jumpedSquare % state.n < m0.x) ? -1 : 1;
+            int origx = m0.x + signx * 2 * Math.abs((m0.jumpedSquare % state.n) - m0.x);
+            int origy = m0.y + signy * 2 * Math.abs((m0.jumpedSquare / state.n) - m0.y);
+            rows[i] = origx;
+            cols[i] = origy;
+            i++;
+        }
+
+        for (InternalMove m : moves) {
+            rows[i] = m.x;
+            cols[i] = m.y;
+            i++;
+        }
+        refMove.RowPositions = rows;
+        refMove.ColPositions = cols;
+        refMove.P = playerId;
+
+        state = state.executeCompound(moves);
+        System.out.println(this.playerId + "'s board");
+        printBoard(System.out);
+
+        return refMove;
+    }
+
+    @Override
+    public void printBoard(PrintStream output) {
+        System.out.println(state.toString());
+    }
+
+    @Override
+    public int opponentMove(Move m) {
+
+//        System.out.println(this.playerId + "'s board before");
+//        printBoard(System.out);
+//
+//        if (m.IsPlaceMove != true) {
+//            int a = 1;
+//        }
+
+        state = state.executeMove(m);
+        //System.out.println(this.playerId + "'s board");
+        //printBoard(System.out);
+        return 1;
     }
 }

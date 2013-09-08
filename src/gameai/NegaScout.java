@@ -4,6 +4,7 @@
  */
 package gameai;
 
+import static gameai.Piece.BLACK;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,25 +32,38 @@ public class NegaScout implements Player, Piece {
         int ret = numbers[0] - numbers[1];
 
 
+
+
+//        ret = 0;
+//        for (int i = 1; i <= 4; i++) {
+//            ret += i * (gb.isWhite(i - 1) ? 1 : 0);
+//            ret += i * (gb.isBlack(i - 1) ? -1 : 0);
+//        }
+
+        if (playerId == BLACK) {
+            ret = -ret;
+        }
+
         return ret;
     }
 
     // TODO - evaluate use of depth.
     public ScoutRet negascout(GameBoard gb, List<InternalMove> p, int alpha, int beta, int d) {
         int b, i;
-        ScoutRet t = new ScoutRet();
+        ScoutRet t;
         ScoutRet a = new ScoutRet();
         // a is best score
         // t is current score
 
         // alpha: lower bound of expected value of tree
         // beta: upper bound of expected value of tree
-
+        
 
         if (d == maxdepth || gb.isOver()) {
+            //System.out.println(gb + "Evaluated to: " + Evaluate(gb, p));
             return new ScoutRet(Evaluate(gb, p), p);
         }
-
+        //System.out.println("new negamax:\n" + gb);
         List<List<InternalMove>> successors = gb.getMoves();
 
 
@@ -64,13 +78,18 @@ public class NegaScout implements Player, Piece {
             t.moveList = moveList;
 
             if ((t.score > a.score) && (t.score < beta) && (i > 1) && (d < maxdepth - 1)) {
+                //System.out.println("Supplementary Search");
                 a = negascout(gb.executeCompound(moveList), moveList, -beta, -t.score, d + 1);
                 a.score = -a.score;
+                a.moveList = moveList;
             }
+
+
 
 
             // if current score is better than best
             if (t.score > a.score) {
+                
                 if (d == -1) {
                     System.out.println("New Best Move! " + t.score + " from " + a.score + " at " + moveList.get(0).x + "," + moveList.get(0).y + ", depth: " + d);
                     System.out.println("******\n" + gb.executeCompound(moveList) + "*****");
@@ -87,6 +106,7 @@ public class NegaScout implements Player, Piece {
                 return a;
             }
             b = a.score + 1;
+            i++;
         }
 
 
@@ -96,7 +116,7 @@ public class NegaScout implements Player, Piece {
 
     public List<InternalMove> chooseMove(GameBoard gb) {
 
-        ScoutRet t = negascout(gb, null, Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
+        ScoutRet t = negascout(gb, null, Integer.MIN_VALUE+1, Integer.MAX_VALUE, 0);
         if (!t.moveList.isEmpty()) {
             //System.out.println("Output from Negamax: " + t.score + " for square " + t.moveList.get(0).x + ":" + t.moveList.get(0).y);
         } else {
@@ -155,10 +175,11 @@ public class NegaScout implements Player, Piece {
             return 0;
         }
         int[] n = state.getNumbers();
+        System.out.println("White: " + n[0] + " Black: " + n[1]);
         if (n[0] > n[1]) {
             return 1;
-        } else if (n[1] < n[0]) {
-            return 0;
+        } else if (n[1] > n[0]) {
+            return 2;
         } else {
             return 3;
         }
@@ -213,8 +234,7 @@ public class NegaScout implements Player, Piece {
         refMove.P = playerId;
 
         state = state.executeCompound(moves);
-        System.out.println(this.playerId + "'s board");
-        printBoard(System.out);
+
 
         return refMove;
     }
@@ -227,16 +247,8 @@ public class NegaScout implements Player, Piece {
     @Override
     public int opponentMove(Move m) {
 
-//        System.out.println(this.playerId + "'s board before");
-//        printBoard(System.out);
-//
-//        if (m.IsPlaceMove != true) {
-//            int a = 1;
-//        }
-
         state = state.executeMove(m);
-        //System.out.println(this.playerId + "'s board");
-        //printBoard(System.out);
+
         return 1;
     }
 }

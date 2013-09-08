@@ -1,3 +1,5 @@
+package gameai;
+
 
 
 public class MinimaxMoveFinder extends MoveFinder {
@@ -9,8 +11,8 @@ public class MinimaxMoveFinder extends MoveFinder {
 	}
 
 	@Override
-	public Move getMove(Gameboard gb) {	
-		// turn current Gameboard into a root node for search tree
+	public Move getMove(GameBoardMitch gb) {	
+		// turn current GameBoardMitch into a root node for search tree
 		Node root = new Node(gb, player);
 		
 		// call minimax function on root node

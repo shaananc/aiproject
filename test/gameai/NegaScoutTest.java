@@ -21,23 +21,29 @@ public class NegaScoutTest {
     private static Player P1;
     private static Player P2;
     private static Move lastPlayedMove;
-    int n = 5;
+    int n = 6;
 
-    
     public NegaScoutTest() {
-
     }
-    
+
+   //@Test
+    public void trialMove() {
+        NegaScout P1 = new NegaScout();
+        P1.init(2, WHITE);
+        Move m = P1.makeMove();
+        System.out.println(m.RowPositions[0] + ":" + m.ColPositions[0]);
+   }
+
     @Test
-    public void test(){
-        
+    public void test() {
+
         lastPlayedMove = new Move();
         int NumberofMoves = 0;
         int boardEmptyPieces = n * n;
         System.out.println("Referee started !");
 
         P1 = (Player) new NegaScout();
-        P2 = (Player) new NegaScout();
+        P2 = (Player) new Mbrunton();
 
 
         P1.init(n, WHITE);
@@ -59,20 +65,20 @@ public class NegaScoutTest {
                 }
 
             }
-            
-            
-            
-            
+
+
+
+
             if (P2.opponentMove(lastPlayedMove) < 0) {
                 System.out.println("Exception: Player 2 rejected the move of player 1.");
                 P1.printBoard(System.out);
                 P2.printBoard(System.out);
                 System.exit(1);
             }
-            
+
             P1.printBoard(System.out);
             P2.printBoard(System.out);
-            
+
             if (boardEmptyPieces <= 0) {
                 break;
             } else {
@@ -89,17 +95,17 @@ public class NegaScoutTest {
                     }
 
                 }
-               
+
                 if (P1.opponentMove(lastPlayedMove) < 0) {
                     System.out.println("Exception: Player 1 rejected the move of player 2.");
                     P2.printBoard(System.out);
                     P1.printBoard(System.out);
                     System.exit(1);
                 }
-                
-                 P1.printBoard(System.out);
+
+                P1.printBoard(System.out);
                 P2.printBoard(System.out);
-                
+
             }
 
         }

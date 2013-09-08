@@ -10,11 +10,15 @@
 package gameai;
 
 public class NeighbourPair {
-	Pos neighbour;
-	Pos neighboursNeighbour;
-	
-	public NeighbourPair(Pos neighbour, Pos neighboursNeighbour) {
-		this.neighbour = neighbour;
-		this.neighboursNeighbour = neighboursNeighbour;
+	int ni;
+	int nj;
+	int nni;
+	int nnj;
+
+	public NeighbourPair(int ni, int nj, int nni, int nnj) {
+		this.ni = ni;
+		this.nj = nj;
+		this.nni = nni;
+		this.nnj = nnj;
 	}
 }

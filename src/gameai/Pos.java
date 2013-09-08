@@ -2,7 +2,7 @@
    Shaanan Cohney   - sncohney
 */
 
-// Pos holds a position on a Gameboard
+// Pos holds a position on a GameBoardMitch
 // where (i, j) goes from (0,0) to (n-1, n-1)
 // i is row position, j is col position
 // rows run from top to bottom, cols run from

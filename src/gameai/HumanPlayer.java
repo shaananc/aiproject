@@ -1,3 +1,5 @@
+package gameai;
+
 import java.util.Scanner;
 
 /* Implementation of Player interface for a human player

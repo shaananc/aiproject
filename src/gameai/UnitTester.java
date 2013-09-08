@@ -1,3 +1,5 @@
+package gameai;
+
 import java.util.ArrayList;
 
 /* scratch-space for unit testing rest of project */
@@ -40,8 +42,8 @@ public class UnitTester implements Piece {
 							 "------" +
 							 "------";
 		
-		Gameboard gb = new Gameboard(n, boardString);
-		System.out.println("Original Gameboard:");
+		GameBoardMitch gb = new GameBoardMitch(n, boardString);
+		System.out.println("Original GameBoardMitch:");
 		System.out.println(gb);
 		
 		Node node = new Node(gb, WHITE);

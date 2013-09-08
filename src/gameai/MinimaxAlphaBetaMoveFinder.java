@@ -1,3 +1,5 @@
+package gameai;
+
 
 public class MinimaxAlphaBetaMoveFinder extends MoveFinder {
 
@@ -13,7 +15,7 @@ public class MinimaxAlphaBetaMoveFinder extends MoveFinder {
 	}
 
 	@Override
-	public Move getMove(Gameboard gb) {
+	public Move getMove(GameBoardMitch gb) {
 		
 		Node root = new Node(gb, player);
 		

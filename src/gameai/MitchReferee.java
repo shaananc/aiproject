@@ -1,3 +1,5 @@
+package gameai;
+
 /* my implementation of referee class for jumper game
    until one provided by tutor makes an appearance
 */

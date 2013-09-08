@@ -1,3 +1,5 @@
+package gameai;
+
 /* a ridiculously basic board evaluator
  */
 
@@ -8,7 +10,7 @@ public class StaticBoardEvaluator extends BoardEvaluator {
 	}
 
 	@Override
-	public int evaluate(Gameboard gb, int player) {
+	public int evaluate(GameBoardMitch gb, int player) {
 		int numPlayer = 0;
 		int numEnemy = 0;
 		for (int i = 0; i < n; i++) {

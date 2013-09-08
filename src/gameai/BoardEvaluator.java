@@ -1,3 +1,5 @@
+package gameai;
+
 
 public abstract class BoardEvaluator implements Piece {
 	// TODO: experiment with making "evaluate" a function of depth - smaller depth = higher utility
@@ -10,7 +12,7 @@ public abstract class BoardEvaluator implements Piece {
 		this.player = player;
 	}
 	
-	public abstract int evaluate(Gameboard gb, int player);
+	public abstract int evaluate(GameBoardMitch gb, int player);
 	
 	public int evaluate(Node node) {
 		return evaluate(node.gb, player);

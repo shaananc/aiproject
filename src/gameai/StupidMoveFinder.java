@@ -1,6 +1,8 @@
+package gameai;
+
 
 /* As dumb as they come... finds moves by scanning
- * Gameboard for next possible place move
+ * GameBoardMitch for next possible place move
  */
 
 public class StupidMoveFinder extends MoveFinder {
@@ -10,7 +12,7 @@ public class StupidMoveFinder extends MoveFinder {
 	}
 
 	@Override
-	public Move getMove(Gameboard gb) {
+	public Move getMove(GameBoardMitch gb) {
 		
 		for (int i = 0; i < gb.n; i++) {
     		for (int j = 0; j < gb.n; j++) {

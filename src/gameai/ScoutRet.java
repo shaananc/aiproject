@@ -12,10 +12,10 @@ import java.util.List;
  * @author SHAANAN
  */
 public class ScoutRet {
-    int score;
+    double score;
     List<InternalMove> moveList;
     
-    public ScoutRet(int score, List<InternalMove> moveList){
+    public ScoutRet(double score, List<InternalMove> moveList){
         this.score = score;
         this.moveList = moveList;
     }

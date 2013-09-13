@@ -115,6 +115,10 @@ public class GameBoard {
         return (mask.get(loc) && (pieces.get(loc) != turn));
     }
 
+    public boolean isSameColor(int loc1, int loc2) {
+        return (mask.get(loc1) == mask.get(loc2)) && (pieces.get(loc1) == pieces.get(loc2));
+    }
+
     public boolean isFull(int loc) {
         return mask.get(loc);
     }
@@ -334,6 +338,39 @@ public class GameBoard {
         }
 
         return count;
+    }
+
+    public List<Integer> getAdjacent(int loc) {
+        List<Integer> l = new LinkedList<Integer>();
+
+        int x = loc%n;
+        int y = loc/n;
+
+        int[] dirs = new int[]{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
+
+        for (int i = 0; i < 8; i++) {
+            int candidate = loc + dirs[i];
+
+            // Check square on board
+            if (candidate > n * n - 1 || candidate < 0) {
+                continue;
+            }
+            // Left Out of Bounds
+            if ((i == 5 || i == 7 || i == 1) && x - 2 < 0) {
+                continue;
+            }
+
+            // Right Out of Bounds
+            if ((i == 4 || i == 6 || i == 0) && x + 2 >= n) {
+                continue;
+            }
+            
+            l.add(candidate);
+
+        }
+
+        return l;
+
     }
 
     private List<InternalMove> getSpaceJumps(int x, int y) {

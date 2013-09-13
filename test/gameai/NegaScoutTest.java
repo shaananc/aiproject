@@ -28,7 +28,7 @@ public class NegaScoutTest {
 
    //@Test
     public void trialMove() {
-        NegaScout P1 = new NegaScout();
+        NegaPlayer P1 = new NegaPlayer();
         P1.init(2, WHITE);
         Move m = P1.makeMove();
         System.out.println(m.RowPositions[0] + ":" + m.ColPositions[0]);
@@ -42,9 +42,10 @@ public class NegaScoutTest {
         int boardEmptyPieces = n * n;
         System.out.println("Referee started !");
 
-        P1 = (Player) new NegaScout();
+        //P2 = (Player) new NegaPlayer();
+        P1 = (Player) new NegaPlayer();
+        //P1 = (Player) new Mbrunton();
         P2 = (Player) new Mbrunton();
-
 
         P1.init(n, WHITE);
         P2.init(n, BLACK);

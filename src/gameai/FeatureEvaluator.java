@@ -26,8 +26,9 @@ public class FeatureEvaluator implements Evaluator {
         }
 
         //ret = fracMine;
-        ret = weightedSafe(gb);
-        return ret* (playerId == 1 ? 1 : -1);
+        ret = weightedSafe(gb)-0.1*gb.countJumpMoves();
+        // -1 for odd max depth, 1 for even max depth?? where is my bug?
+        return ret;
     }
 
     private double weightedSafe(GameBoard gb) {

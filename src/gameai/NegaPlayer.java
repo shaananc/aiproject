@@ -43,12 +43,28 @@ public class NegaPlayer implements Player, Piece {
 
     @Override
     public Move makeMove() {
-        List<InternalMove> moves = new NegaScout(playerId).chooseMove(state);
 
         Move refMove = new Move();
 
         int rows[];
         int cols[];
+
+        if (state.depth == 0) {
+            refMove.IsPlaceMove = true;
+            refMove.RowPositions = new int[1];
+            refMove.ColPositions = new int[1];
+            refMove.RowPositions[0] = 0;
+            refMove.ColPositions[0] = 0;
+
+            refMove.P = playerId;
+            state = state.executeMove(refMove);
+            return refMove;
+        }
+
+        List<InternalMove> moves = new NegaScout(playerId).chooseMove(state);
+
+
+
         int i = 0;
 
         if (moves.size() == 1 && moves.get(0).jumpedSquare == -2) {

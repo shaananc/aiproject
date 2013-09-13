@@ -14,7 +14,7 @@ import java.util.Scanner;
  */
 public class NegaScout {
 
-    int maxdepth = 6;
+    int maxdepth = 5;
     int playerId;
     Evaluator evaluator;
 
@@ -29,7 +29,7 @@ public class NegaScout {
     }
 
     // TODO - evaluate use of depth.
-    public ScoutRet negascout(GameBoard gb, List<InternalMove> p, double alpha, double beta, int d) {
+    public ScoutRet negascout(GameBoard gb, List<InternalMove> p, double alpha, double beta, int d, int color) {
         double b, i;
         ScoutRet t;
         ScoutRet a = new ScoutRet();
@@ -42,7 +42,7 @@ public class NegaScout {
 
         if (d == maxdepth || gb.isOver()) {
             //System.out.println(gb + "Evaluated to: " + Evaluate(gb, p));
-            return new ScoutRet(evaluator.Evaluate(gb, p, playerId), p);
+            return new ScoutRet(color*evaluator.Evaluate(gb, p, playerId), p);
         }
         //System.out.println("new negamax:\n" + gb);
         List<List<InternalMove>> successors = gb.getMoves();
@@ -54,13 +54,13 @@ public class NegaScout {
 
         i = 1;
         for (List<InternalMove> moveList : successors) {
-            t = negascout(gb.executeCompound(moveList), moveList, -b, -a.score, d + 1);
+            t = negascout(gb.executeCompound(moveList), moveList, -b, -a.score, d + 1, -color);
             t.score = -t.score;
             t.moveList = moveList;
 
             if ((t.score > a.score) && (t.score < beta) && (i > 1) && (d < maxdepth - 1)) {
                 //System.out.println("Supplementary Search");
-                a = negascout(gb.executeCompound(moveList), moveList, -beta, -t.score, d + 1);
+                a = negascout(gb.executeCompound(moveList), moveList, -beta, -t.score, d + 1, -color);
                 a.score = -a.score;
                 a.moveList = moveList;
             }
@@ -92,7 +92,7 @@ public class NegaScout {
 
     public List<InternalMove> chooseMove(GameBoard gb) {
 
-        ScoutRet t = negascout(gb, null, Integer.MIN_VALUE + 1, Integer.MAX_VALUE, 0);
+        ScoutRet t = negascout(gb, null, Integer.MIN_VALUE + 1, Integer.MAX_VALUE, 0, (playerId == 1 ? 1 : -1) );
         if (!t.moveList.isEmpty()) {
             //System.out.println("Output from Negamax: " + t.score + " for square " + t.moveList.get(0).x + ":" + t.moveList.get(0).y);
         } else {

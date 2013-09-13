@@ -19,7 +19,7 @@ public class FeatureEvaluator implements Evaluator {
         double fracMine = (numbers[0] - numbers[1]) / (gb.n * gb.n);
 
 
-        if (gb.isOver()) {
+        if (gb.isOver() || gb.n < 5) {
             ret = numbers[0] > numbers[1] ? 1 : -1;
             return ret;
         } else {

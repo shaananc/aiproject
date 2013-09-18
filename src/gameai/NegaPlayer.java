@@ -109,9 +109,7 @@ public class NegaPlayer implements Player, Piece {
 
     @Override
     public int opponentMove(Move m) {
-
         state = state.executeMove(m);
-
         return 1;
     }
 }

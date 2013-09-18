@@ -14,7 +14,7 @@ import java.util.Scanner;
  */
 public class NegaScout {
 
-    int maxdepth = 5;
+    int maxdepth = 6;
     int playerId;
     Evaluator evaluator;
 

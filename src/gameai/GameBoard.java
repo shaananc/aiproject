@@ -30,7 +30,6 @@ public class GameBoard {
     BitSet pieces;
     BitSet mask;
     int n;
-    
     int depth;
 
     public GameBoard(int n) {
@@ -91,8 +90,22 @@ public class GameBoard {
             }
             loc += 1;
         }
-        
+
         depth = 0;
+    }
+
+    public int getWinner() {
+        if (!isOver()) {
+            return 0;
+        }
+        int[] n = getNumbers();
+        if (n[0] > n[1]) {
+            return 1;
+        } else if (n[1] > n[0]) {
+            return 2;
+        } else {
+            return 3;
+        }
     }
 
     // 11 black, 10, white, 00, clear, 01 X
@@ -183,8 +196,8 @@ public class GameBoard {
 
             gb.setDead(move.jumpedSquare);
         }
-        
-        gb.depth = depth+1;
+
+        gb.depth = depth + 1;
 
         return gb;
     }
@@ -193,8 +206,8 @@ public class GameBoard {
 
 
         GameBoard gb = (GameBoard) this.deepCopy();
-        
-        
+
+
         if (m.IsPlaceMove) {
             if (m.P == Move.WHITE) {
                 gb.setWhite(m.RowPositions[0] + n * m.ColPositions[0]);
@@ -226,8 +239,8 @@ public class GameBoard {
 
             }
         }
-        
-        gb.depth = depth+1;
+
+        gb.depth = depth + 1;
 
         gb.turn = !gb.turn;
 
@@ -353,8 +366,8 @@ public class GameBoard {
     public List<Integer> getAdjacent(int loc) {
         List<Integer> l = new LinkedList<Integer>();
 
-        int x = loc%n;
-        int y = loc/n;
+        int x = loc % n;
+        int y = loc / n;
 
         int[] dirs = new int[]{1, -1, n, -n, n + 1, n - 1, -n + 1, -n - 1};
 
@@ -374,7 +387,7 @@ public class GameBoard {
             if ((i == 4 || i == 6 || i == 0) && x + 2 >= n) {
                 continue;
             }
-            
+
             l.add(candidate);
 
         }

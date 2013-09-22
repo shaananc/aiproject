@@ -15,54 +15,43 @@ import org.encog.persist.EncogDirectoryPersistence;
  */
 public class MLPTrainer {
 
-    private static Player P1;
-    private static Player P2;
     private static Move lastPlayedMove;
     int n = 4;
     public MLPPlayer myMLPPlayer;
     public MLPPlayer myMLPPlayer2;
     public String FILENAME = "encognn.eg";
 
-    public static void main(String[] args) {
-        //test();
+    public void run() {
         MLPTrainer trainer = new MLPTrainer();
 
+        Player MLP1 = (Player) myMLPPlayer;
+        Player MLP2 = (Player) myMLPPlayer2;
+        Player NP = (Player) new NegaPlayer();
+        Player MitchP = (Player) new Mbrunton();
+
         int i = 1;
-        while (i <= 10) {
+        while (i <= 100) {
             if (i % 10 == 0) {
-//                trainer.myMLPPlayer.pauseLearning();
                 trainer.myMLPPlayer.isLearning = false;
-//                trainer.myMLPPlayer2.pauseLearning();
                 trainer.myMLPPlayer2.isLearning = false;
 
-                trainer.playWithOutput();
-                //trainer.myMLPPlayer.MLP.save("mlp.nnet");
+                trainer.playWithOutput(MLP1, NP);
 
-//                trainer.myMLPPlayer2.resumeLearning();
                 trainer.myMLPPlayer2.isLearning = true;
-//                trainer.myMLPPlayer.resumeLearning();
                 trainer.myMLPPlayer.isLearning = true;
 
 
-
-
-
             } else {
-
-                //trainer.playGame();
-
+                trainer.playGame(MLP1, MLP2);
+                trainer.playGame(MLP1, NP);
+                //trainer.playGame(MLP1, MitchP);
+                //trainer.playGame(NP, MLP1);
+                //trainer.playGame(MitchP, MLP1);
             }
 
-            if (i % 10 == 0) {
-//                File f = new File("mlp.nnet");
-//                if (f.exists()) {
-//                    f.delete();
-//
-//                }
-                //trainer.myMLPPlayer.MLP.save("mlp.nnet");
+            if (i % 2 == 0) {
                 EncogDirectoryPersistence.saveObject(new File("encognn.eg"), trainer.myMLPPlayer.network);
             }
-            //System.out.println("\nGame number: " + i);
             System.out.flush();
             i++;
         }
@@ -75,18 +64,13 @@ public class MLPTrainer {
         myMLPPlayer2 = new MLPPlayer(n, myMLPPlayer.network);
     }
 
-    public void playGame() {
+    public void playGame(Player P1, Player P2) {
 
         lastPlayedMove = new Move();
         int boardEmptyPieces = n * n;
 
-
-        P1 = (Player) myMLPPlayer;
-        P2 = (Player) myMLPPlayer2;
-
         P1.init(n, WHITE);
         P2.init(n, BLACK);
-
 
         while (boardEmptyPieces > 0) {
             lastPlayedMove = P1.makeMove();
@@ -97,8 +81,6 @@ public class MLPTrainer {
                     boardEmptyPieces--;
                 }
             }
-
-
 
 
             if (P2.opponentMove(lastPlayedMove) < 0) {
@@ -127,17 +109,12 @@ public class MLPTrainer {
         }
     }
 
-    public void playWithOutput() {
+    public void playWithOutput(Player P1, Player P2) {
 
         lastPlayedMove = new Move();
         int NumberofMoves = 0;
         int boardEmptyPieces = n * n;
         System.out.println("Referee started !");
-
-        //P2 = (Player) new NegaPlayer();
-        P1 = (Player) myMLPPlayer;
-        //P2 = (Player) new Mbrunton();
-        P2 = (Player) new NegaPlayer();
 
         P1.init(n, WHITE);
         P2.init(n, BLACK);
@@ -213,4 +190,11 @@ public class MLPTrainer {
         System.out.println("Total Number of Moves Played in the Game: " + NumberofMoves);
         System.out.println("Referee Finished !");
     }
+
+    public static void main(String args[]){
+        MLPTrainer trainer = new MLPTrainer();
+        trainer.run();
+    }
+    
+    
 }

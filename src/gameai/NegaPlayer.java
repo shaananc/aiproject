@@ -16,7 +16,7 @@ public class NegaPlayer implements Player, Piece {
     GameBoard state;
     int playerId;
     
-    int maxDepth = 3;
+    int maxDepth = 4;
 
     @Override
     public int getWinner() {

@@ -8,13 +8,16 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 import org.encog.engine.network.activation.ActivationSigmoid;
+import org.encog.ml.train.MLTrain;
 import org.encog.neural.data.NeuralDataSet;
 import org.encog.neural.data.basic.BasicNeuralDataSet;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
 import org.encog.neural.networks.training.Train;
 import org.encog.neural.networks.training.lma.LevenbergMarquardtTraining;
+import org.encog.neural.networks.training.propagation.back.Backpropagation;
 import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
 import org.encog.persist.EncogDirectoryPersistence;
 
@@ -32,6 +35,7 @@ public class MLPPlayer implements Player {
     //encog network
     BasicNetwork network;
     boolean isLearning;
+    Stack<GameBoard> priorStates;
 
     public MLPPlayer(int n) {
 
@@ -52,6 +56,8 @@ public class MLPPlayer implements Player {
 
 
         isLearning = true;
+
+        priorStates = new Stack<GameBoard>();
 
     }
 
@@ -103,9 +109,11 @@ public class MLPPlayer implements Player {
         System.out.println(gb);
         double input[] = genInput(gb);
         for (int i = 0; i < input.length;) {
-            System.out.print("["+input[i] + " " + input[i + 1] + " " + input[i + 2]+"]");
+            System.out.print("[" + input[i] + " " + input[i + 1] + " " + input[i + 2] + "]");
             i += 3;
-            if((i/3)%gb.n == 0){System.out.print("\n");}
+            if ((i / 3) % gb.n == 0) {
+                System.out.print("\n");
+            }
         }
         System.out.println();
     }
@@ -133,7 +141,7 @@ public class MLPPlayer implements Player {
 
         double max = Double.NEGATIVE_INFINITY;
 
-
+        priorStates.add(state);
 
         List<InternalMove> bestMove = null;
 
@@ -154,12 +162,13 @@ public class MLPPlayer implements Player {
 
         GameBoard new_state = state.executeCompound(bestMove);
 
+        state = new_state;
 
-        if (isLearning) {
-            learn(new_state, m);
+        if (isLearning && new_state.isOver()) {
+            learn();
         }
 
-        state = new_state;
+
 
         return m;
     }
@@ -168,48 +177,76 @@ public class MLPPlayer implements Player {
     public int opponentMove(Move m) {
         GameBoard new_state = state.executeMove(m);
 
-        if (isLearning) {
-            learn(new_state, m);
-        }
+        priorStates.add(state);
 
         state = new_state;
+
+        if (isLearning && new_state.isOver()) {
+            learn();
+        }
+
+
 
 
         return 1;
     }
 
-    public void learn(GameBoard new_state, Move m) {
+    public void learn() {
 
 
         double training_input[][] = new double[1][n_inputs];
         double training_output[][] = new double[1][2];
         double cur_in[];
-        if (new_state.isOver()) {
 
-            cur_in = genInput(new_state);
+
+        cur_in = genInput(state);
+        System.arraycopy(cur_in, 0, training_input[0], 0, cur_in.length);
+
+        //System.out.println(state);
+        double rewardWhite = (state.getWinner() == 1 ? 1 : 0);
+        double rewardBlack = (state.getWinner() == 2 ? 1 : 0);
+
+        training_output[0][0] = rewardWhite;
+        training_output[0][1] = rewardBlack;
+
+        NeuralDataSet trainingSet = new BasicNeuralDataSet(training_input, training_output);
+        MLTrain train = new Backpropagation(network, trainingSet, 0.4, 0.9);
+        train.iteration();
+        train.finishTraining();
+
+        double next_out[] = new double[2];
+        network.compute(cur_in, next_out);
+
+        int i = 0;
+        while (!priorStates.empty()) {
+            GameBoard gb = priorStates.pop();
+            //System.out.println(gb);
+            cur_in = genInput(gb);
+
             System.arraycopy(cur_in, 0, training_input[0], 0, cur_in.length);
+            System.arraycopy(next_out, 0, training_output[0], 0, next_out.length);
 
-            //System.out.println(new_state.toString());
+            trainingSet = new BasicNeuralDataSet(training_input, training_output);
+            train = new Backpropagation(network, trainingSet, 0.4, 0.9);
+            train.iteration();
+            train.finishTraining();
 
-            double rewardWhite = (new_state.getWinner() == 1 ? 1 : 0);
-            double rewardBlack = (new_state.getWinner() == 2 ? 1 : 0);
+            network.compute(cur_in, next_out);
 
-            training_output[0][0] = rewardWhite;
-            training_output[0][1] = rewardBlack;
 
-        } else {
-            cur_in = genInput(new_state);
-            System.arraycopy(cur_in, 0, training_input[0], 0, cur_in.length);
+            i++;
 
-            network.compute(training_input[0], training_output[0]);
         }
 
 
-        NeuralDataSet trainingSet = new BasicNeuralDataSet(training_input, training_output);
-        //final LevenbergMarquardtTraining train = new LevenbergMarquardtTraining(network, trainingSet);
-        final ResilientPropagation train = new ResilientPropagation(network, trainingSet);
-        train.iteration(1);
-        train.finishTraining();
+
+        //NeuralDataSet trainingSet = new BasicNeuralDataSet(training_input, training_output);
+        //MLTrain train = new ResilientPropagation(network, trainingSet);
+        //MLTrain train = new Backpropagation(network, trainingSet, 0.4, 0.9);
+        //train.iteration();
+        //train.finishTraining();
+
+        priorStates.clear();
 
     }
 

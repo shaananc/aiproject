@@ -6,7 +6,6 @@ package gameai;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.encog.engine.network.activation.ActivationSigmoid;
@@ -16,15 +15,8 @@ import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
 import org.encog.neural.networks.training.Train;
 import org.encog.neural.networks.training.lma.LevenbergMarquardtTraining;
+import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
 import org.encog.persist.EncogDirectoryPersistence;
-import org.neuroph.core.NeuralNetwork;
-import org.neuroph.nnet.MultiLayerPerceptron;
-import org.neuroph.util.TransferFunctionType;
-import org.neuroph.core.data.DataSet;
-import org.neuroph.core.data.DataSetRow;
-import org.neuroph.core.learning.LearningRule;
-import org.neuroph.nnet.learning.DynamicBackPropagation;
-import org.neuroph.nnet.learning.MomentumBackpropagation;
 
 /**
  *
@@ -39,10 +31,7 @@ public class MLPPlayer implements Player {
     int n_inputs;
     //encog network
     BasicNetwork network;
-    // MLP backpropagation variables
     boolean isLearning;
-    LinkedList<double[]> prevInputs;
-    double gamma = 0.9;
 
     public MLPPlayer(int n) {
 
@@ -63,7 +52,6 @@ public class MLPPlayer implements Player {
 
 
         isLearning = true;
-        prevInputs = new LinkedList();
 
     }
 
@@ -101,14 +89,25 @@ public class MLPPlayer implements Player {
             input_index += 3;
         }
 
-        inputs[input_index] = (gb.turn == GameBoard.WHITE ? 0 : 1);
+        inputs[input_index] = (gb.turn == GameBoard.WHITE ? 1 : 0);
         input_index += 1;
-        inputs[input_index] = (gb.turn == GameBoard.BLACK ? 0 : 1);
+        inputs[input_index] = (gb.turn == GameBoard.BLACK ? 1 : 0);
 
         input_index += 1;
         inputs[input_index] = 1;
 
         return inputs;
+    }
+
+    private void print_input(GameBoard gb) {
+        System.out.println(gb);
+        double input[] = genInput(gb);
+        for (int i = 0; i < input.length;) {
+            System.out.print("["+input[i] + " " + input[i + 1] + " " + input[i + 2]+"]");
+            i += 3;
+            if((i/3)%gb.n == 0){System.out.print("\n");}
+        }
+        System.out.println();
     }
 
     // when in learning mode:
@@ -124,35 +123,25 @@ public class MLPPlayer implements Player {
         this.playerId = p;
 
         state = new GameBoard(n);
-        prevInputs.clear();
 
         return 1;
-    }
-
-    public void pauseLearning() {
-        //MLP.pauseLearning();
-    }
-
-    public void resumeLearning() {
-        //MLP.resumeLearning();
     }
 
     @Override
     public Move makeMove() {
         List<List<InternalMove>> moves = state.getMoves();
 
-        double max = -1;
+        double max = Double.NEGATIVE_INFINITY;
+
+
 
         List<InternalMove> bestMove = null;
 
-        double[] inputs = genInput(state);
-        //prevInputs.add(inputs);
-
-
+        double eval;
         for (List<InternalMove> move : moves) {
             GameBoard gb = state.executeCompound(move);
 
-            double eval = evaluate(gb);
+            eval = evaluate(gb);
             if (eval > max) {
                 max = eval;
                 bestMove = move;
@@ -160,76 +149,68 @@ public class MLPPlayer implements Player {
 
         }
 
+
+        Move m = MoveConverter.InternaltoExternal(bestMove, n, playerId);
+
         GameBoard new_state = state.executeCompound(bestMove);
 
 
         if (isLearning) {
-
-            double training_input[][] = new double[1][n_inputs];
-            double training_output[][] = new double[1][2];
-            double cur_in[] = genInput(state);
-            System.arraycopy(cur_in, 0, training_input[0], 0, cur_in.length);
-
-            if (new_state.isOver()) {
-                double rewardWhite = (new_state.getWinner() == 1 ? 1 : 0);
-                double rewardBlack = (new_state.getWinner() == 2 ? 1 : 0);
-
-                training_output[0][0] = rewardWhite;
-                training_output[0][1] = rewardBlack;
-
-            } else {
-                network.compute(training_input[0], training_output[0]);
-            }
-
-
-            NeuralDataSet trainingSet = new BasicNeuralDataSet(training_input, training_output);
-            final LevenbergMarquardtTraining train = new LevenbergMarquardtTraining(network, trainingSet);
-            train.iteration(1);
-            train.finishTraining();
-
+            learn(new_state, m);
         }
 
         state = new_state;
 
-        return MoveConverter.InternaltoExternal(bestMove, n, playerId);
+        return m;
     }
 
     @Override
     public int opponentMove(Move m) {
         GameBoard new_state = state.executeMove(m);
 
-        double[] inputs = genInput(state);
-
         if (isLearning) {
-
-            double training_input[][] = new double[1][n_inputs];
-            double training_output[][] = new double[1][2];
-            double cur_in[] = genInput(state);
-            System.arraycopy(cur_in, 0, training_input[0], 0, cur_in.length);
-
-            if (new_state.isOver()) {
-                double rewardWhite = (new_state.getWinner() == 1 ? 1 : 0);
-                double rewardBlack = (new_state.getWinner() == 2 ? 1 : 0);
-
-                training_output[0][0] = rewardWhite;
-                training_output[0][1] = rewardBlack;
-
-            } else {
-                network.compute(training_input[0], training_output[0]);
-            }
-
-
-            NeuralDataSet trainingSet = new BasicNeuralDataSet(training_input, training_output);
-            final LevenbergMarquardtTraining train = new LevenbergMarquardtTraining(network, trainingSet);
-            train.iteration(1);
-            train.finishTraining();
-
+            learn(new_state, m);
         }
 
         state = new_state;
 
 
         return 1;
+    }
+
+    public void learn(GameBoard new_state, Move m) {
+
+
+        double training_input[][] = new double[1][n_inputs];
+        double training_output[][] = new double[1][2];
+        double cur_in[];
+        if (new_state.isOver()) {
+
+            cur_in = genInput(new_state);
+            System.arraycopy(cur_in, 0, training_input[0], 0, cur_in.length);
+
+            //System.out.println(new_state.toString());
+
+            double rewardWhite = (new_state.getWinner() == 1 ? 1 : 0);
+            double rewardBlack = (new_state.getWinner() == 2 ? 1 : 0);
+
+            training_output[0][0] = rewardWhite;
+            training_output[0][1] = rewardBlack;
+
+        } else {
+            cur_in = genInput(new_state);
+            System.arraycopy(cur_in, 0, training_input[0], 0, cur_in.length);
+
+            network.compute(training_input[0], training_output[0]);
+        }
+
+
+        NeuralDataSet trainingSet = new BasicNeuralDataSet(training_input, training_output);
+        //final LevenbergMarquardtTraining train = new LevenbergMarquardtTraining(network, trainingSet);
+        final ResilientPropagation train = new ResilientPropagation(network, trainingSet);
+        train.iteration(1);
+        train.finishTraining();
+
     }
 
     @Override

@@ -18,7 +18,7 @@ public class MLPTrainer {
     private static Player P1;
     private static Player P2;
     private static Move lastPlayedMove;
-    int n = 5;
+    int n = 4;
     public MLPPlayer myMLPPlayer;
     public MLPPlayer myMLPPlayer2;
     public String FILENAME = "encognn.eg";
@@ -27,8 +27,8 @@ public class MLPTrainer {
         //test();
         MLPTrainer trainer = new MLPTrainer();
 
-        int i = 0;
-        while (true) {
+        int i = 1;
+        while (i <= 10) {
             if (i % 10 == 0) {
 //                trainer.myMLPPlayer.pauseLearning();
                 trainer.myMLPPlayer.isLearning = false;
@@ -49,7 +49,7 @@ public class MLPTrainer {
 
             } else {
 
-                trainer.playGame();
+                //trainer.playGame();
 
             }
 
@@ -62,7 +62,7 @@ public class MLPTrainer {
                 //trainer.myMLPPlayer.MLP.save("mlp.nnet");
                 EncogDirectoryPersistence.saveObject(new File("encognn.eg"), trainer.myMLPPlayer.network);
             }
-            System.out.println("\nGame number: " + i);
+            //System.out.println("\nGame number: " + i);
             System.out.flush();
             i++;
         }
@@ -136,7 +136,7 @@ public class MLPTrainer {
 
         //P2 = (Player) new NegaPlayer();
         P1 = (Player) myMLPPlayer;
-        //P1 = (Player) new Mbrunton();
+        //P2 = (Player) new Mbrunton();
         P2 = (Player) new NegaPlayer();
 
         P1.init(n, WHITE);

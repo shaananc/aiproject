@@ -14,6 +14,10 @@ public class MoveConverter {
 
     public static Move InternaltoExternal(List<InternalMove> moves, int n, int playerId) {
 
+        if(moves == null){
+            int debug = 1;
+        }
+        
         Move refMove = new Move();
 
         int rows[];

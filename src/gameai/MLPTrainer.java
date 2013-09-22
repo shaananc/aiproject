@@ -22,8 +22,7 @@ public class MLPTrainer {
     public MLPPlayer myMLPPlayer;
     public MLPPlayer myMLPPlayer2;
     public String FILENAME = "encognn.eg";
-    
-    
+
     public static void main(String[] args) {
         //test();
         MLPTrainer trainer = new MLPTrainer();
@@ -32,17 +31,17 @@ public class MLPTrainer {
         while (true) {
             if (i % 10 == 0) {
 //                trainer.myMLPPlayer.pauseLearning();
-//                trainer.myMLPPlayer.isLearning = false;
+                trainer.myMLPPlayer.isLearning = false;
 //                trainer.myMLPPlayer2.pauseLearning();
-//                trainer.myMLPPlayer2.isLearning = false;
+                trainer.myMLPPlayer2.isLearning = false;
 
                 trainer.playWithOutput();
                 //trainer.myMLPPlayer.MLP.save("mlp.nnet");
 
 //                trainer.myMLPPlayer2.resumeLearning();
-//                trainer.myMLPPlayer2.isLearning = true;
+                trainer.myMLPPlayer2.isLearning = true;
 //                trainer.myMLPPlayer.resumeLearning();
-//                trainer.myMLPPlayer.isLearning = true;
+                trainer.myMLPPlayer.isLearning = true;
 
 
 
@@ -54,7 +53,7 @@ public class MLPTrainer {
 
             }
 
-            if (i % 1 == 0) {
+            if (i % 10 == 0) {
 //                File f = new File("mlp.nnet");
 //                if (f.exists()) {
 //                    f.delete();
@@ -73,7 +72,7 @@ public class MLPTrainer {
 
     public MLPTrainer() {
         myMLPPlayer = new MLPPlayer(n);
-        myMLPPlayer2 = new MLPPlayer(n);
+        myMLPPlayer2 = new MLPPlayer(n, myMLPPlayer.network);
     }
 
     public void playGame() {

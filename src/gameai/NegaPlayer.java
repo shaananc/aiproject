@@ -15,6 +15,8 @@ public class NegaPlayer implements Player, Piece {
 
     GameBoard state;
     int playerId;
+    
+    int maxDepth = 2;
 
     @Override
     public int getWinner() {
@@ -37,7 +39,7 @@ public class NegaPlayer implements Player, Piece {
         state = new GameBoard(n);
         //state.turn = GameBoard.WHITE;
         playerId = p;
-
+        
         return 1;
     }
 
@@ -61,7 +63,7 @@ public class NegaPlayer implements Player, Piece {
             return refMove;
         }
 
-        List<InternalMove> moves = new NegaScout(playerId).chooseMove(state);
+        List<InternalMove> moves = new NegaScout(playerId,maxDepth).chooseMove(state);
 
 
 

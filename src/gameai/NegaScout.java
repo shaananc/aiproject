@@ -18,13 +18,14 @@ public class NegaScout {
     int playerId;
     Evaluator evaluator;
 
-    public NegaScout(int playerId) {
+    public NegaScout(int playerId, int maxdepth) {
         this.playerId = playerId;
         evaluator = new FeatureEvaluator();
+        this.maxdepth = maxdepth;
     }
 
-    public NegaScout(int playerId,Evaluator e) {
-        this(playerId);
+    public NegaScout(int playerId,int maxdepth,Evaluator e) {
+        this(playerId, maxdepth);
         evaluator = e;
     }
 
@@ -108,7 +109,7 @@ public class NegaScout {
     }
 
     public static void playHuman() {
-        NegaScout ns = new NegaScout(1);
+        NegaScout ns = new NegaScout(1,3);
         GameBoard gb = new GameBoard(5);
         System.out.println(gb);
 

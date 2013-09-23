@@ -8,26 +8,27 @@ import java.util.Comparator;
  */
 
 public class Node implements Piece {
-	Node parentNode;
 	ArrayList<Node> childNodes;
 
 	Gameboard gb;
 	int whosTurn;
 	Move lastMove;
 	int utility;
+	int projectedUtility;
+	public static final boolean ORDERING_NODES = false;
 	
 	// default constructor
 	public Node(Gameboard gb) {
 		this.gb = gb;
 		this.childNodes = new ArrayList<Node>();
 		this.utility = INVALID;
+		this.projectedUtility = INVALID;
 	}
 	
 	// constructor for root node
 	public Node(Gameboard gb, int whosTurn) {
 		this(gb);
 		
-		this.parentNode = null;
 		this.lastMove = null;
 		this.whosTurn = whosTurn;
 	}
@@ -35,8 +36,6 @@ public class Node implements Piece {
 	// constructor for non-root node, lastMove is move which created this node
 	public Node(Node parentNode, Gameboard gb, Move lastMove) {
 		this(gb);
-		
-		this.parentNode = parentNode;
 		this.lastMove = lastMove;
 		
 		if (parentNode.whosTurn == WHITE) {
@@ -44,6 +43,7 @@ public class Node implements Piece {
 		} else {
 			this.whosTurn = WHITE;
 		}
+		
 	}
 	
 	// generate all child nodes for some parent node
@@ -54,12 +54,22 @@ public class Node implements Piece {
 	
 	// get child nodes, but order them based on whether we want
 	// best nodes first, or worst
-	public void getChildNodes(boolean bestFirst) {
+	public void getChildNodes(boolean isMaxNode, BoardEvaluator evaluator) {
 		getChildNodes();
-		if (bestFirst) {
-			Collections.sort(childNodes, COMPARE_BEST_FIRST);
-		} else {
-			Collections.sort(childNodes, COMPARE_WORST_FIRST);
+		
+		// NOTE: Finding a projected utility just seems to slow things down...
+		// We seem to be better just putting jump nodes first for all nodes
+		
+		if (ORDERING_NODES) {
+			for (Node childNode : childNodes) {
+				evaluator.setProjectedUtility(childNode);
+			}
+			// order nodes based on projected utility
+			if (isMaxNode) {
+				Collections.sort(childNodes, COMPARE_BEST_FIRST);
+			} else {
+				Collections.sort(childNodes, COMPARE_WORST_FIRST);
+			}
 		}
 	}
 	
@@ -73,19 +83,23 @@ public class Node implements Piece {
 					int[] colPositions = {j};
 					
 					Move placeMove = new Move(whosTurn, true, rowPositions, colPositions);
-					Gameboard childBoard = gb.applyMoveToChildBoard(placeMove);
+					Gameboard childBoard = Gameboard.newInstance(gb);
+					childBoard.applyMove(placeMove);
 					this.childNodes.add(new Node(this, childBoard, placeMove));
 				}
 			}
 		}
 	}
 	
-	// generate child nodes corresponding to jump nodes
+	// generate child nodes corresponding to jump moves
 	public void getChildJumpNodes() {
 		
 		ArrayList<Integer> rowList;
 		ArrayList<Integer> colList;
 		
+		// for each cell, if the cell has a player piece,
+		// add all nodes corresponding to jump moves which
+		// start at that piece
 		for (int i = 0; i < gb.n; i++) {
 			for (int j = 0; j < gb.n; j++) {
 				if (gb.board[i * gb.n + j] == whosTurn) {
@@ -103,28 +117,35 @@ public class Node implements Piece {
 		
 		ArrayList<NeighbourPair> neighbourPairs = newBoard.getNeighbourPairs(i, j);
 		
+		// for each possible jump location from (i, j)...
 		for (NeighbourPair pair : neighbourPairs) {
 			int neighbour = newBoard.board[pair.ni * gb.n + pair.nj];
 			int neighboursNeighbour = newBoard.board[pair.nni * gb.n + pair.nnj];
+			// if we can legally jump there...
 			if (neighboursNeighbour == EMPTY && (neighbour == BLACK || neighbour == WHITE)) {
 				rowList.add(pair.nni);
 				colList.add(pair.nnj);
+				// create the jump move which finishes at neighboursNeighbour
 				Move jumpMove = createMoveFromArrayLists(false, rowList, colList);
 				Gameboard childBoard = Gameboard.newInstance(newBoard);
+				// apply that final jump to a new board
 				childBoard.board[pair.nni * gb.n + pair.nnj] = whosTurn;
 				if (childBoard.board[pair.ni * gb.n + pair.nj] != whosTurn) {
 					childBoard.board[pair.ni * gb.n + pair.nj] = DEAD; 
 				}
-				
+				// add jump node to childNodes
 				Node childNode = new Node(this, childBoard, jumpMove);
 				this.childNodes.add(childNode);
+				// recursively add subsequent jumps
 				getChildJumpNodesFromPos(childBoard, pair.nni, pair.nnj, rowList, colList);
+				// retract final jump, and continue search with next neighbourPair
 				rowList.remove(rowList.size() - 1);
 				colList.remove(colList.size() - 1);
 			}
 		}		
 	}
 	
+	// create a Move object from ArrayLists (used when recursively finding jump moves from a position)
 	public Move createMoveFromArrayLists(boolean isPlaceMove, ArrayList<Integer> rowList, ArrayList<Integer> colList) {
 		int[] rowPositions = new int[rowList.size()];
 		int[] colPositions = new int[colList.size()];
@@ -136,20 +157,36 @@ public class Node implements Piece {
 		return new Move(whosTurn, isPlaceMove, rowPositions, colPositions);
 	}
 	
-	// assume longest move is best
+	public void resetChildren() {
+		this.childNodes = new ArrayList<Node>();
+	}
+	
+	// return list of nodes with random gameboards
+	public static ArrayList<Node> getTrainingSet(int size, int n, int whosTurn) {
+		ArrayList<Node> trainingSet = new ArrayList<Node>();
+		for (int i = 0; i < size; i++) {
+			Node node = new Node(Gameboard.getRandomBoard(n), whosTurn);
+			trainingSet.add(node);
+		}
+		return trainingSet;
+	}
+	
+	// use projectedUtility to order nodes
 	public static Comparator<Node> COMPARE_BEST_FIRST = new Comparator<Node>() {
 		public int compare(Node node1, Node node2) {
-			Integer len1 = new Integer(node1.lastMove.RowPositions.length);
-			Integer len2 = new Integer(node2.lastMove.RowPositions.length);
-			return len1.compareTo(len2);
+			Integer projectedUtility1 = new Integer(node1.projectedUtility);
+			Integer projectedUtility2 = new Integer(node2.projectedUtility);
+			// reverse the order, since higher projected utility should come first
+			return projectedUtility2.compareTo(projectedUtility1);
 		}
 	};
 	
 	public static Comparator<Node> COMPARE_WORST_FIRST = new Comparator<Node>() {
 		public int compare(Node node1, Node node2) {
-			Integer len1 = new Integer( - node1.lastMove.RowPositions.length);
-			Integer len2 = new Integer( - node2.lastMove.RowPositions.length);
-			return len1.compareTo(len2);
+			Integer projectedUtility1 = new Integer(node1.projectedUtility);
+			Integer projectedUtility2 = new Integer(node2.projectedUtility);
+			// lower projected utility should come first
+			return projectedUtility1.compareTo(projectedUtility2);
 		}
 	};
 	

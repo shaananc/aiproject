@@ -6,7 +6,7 @@ import java.util.Scanner;
 
 //import csproj.jumper.*
 
-public class HumanPlayer extends Mbrunton {
+public class HumanPlayer extends BotPlayer {
 	Scanner in;
     public HumanPlayer() {
     	super();

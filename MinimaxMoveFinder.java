@@ -1,9 +1,7 @@
 
 
 public class MinimaxMoveFinder extends MoveFinder {
-	
-	public static final int MAX_DEPTH = 6;
-	
+		
 	public MinimaxMoveFinder(int n, int player) {
 		super(n, player);
 	}
@@ -35,13 +33,8 @@ public class MinimaxMoveFinder extends MoveFinder {
 			return node.utility;
 		}
 		
-		// generate jump nodes first, and if there are none then look to place nodes
-		/*node.getChildJumpNodes();
-		if (node.childNodes.size() == 0) {
-			node.getChildPlaceNodes();
-		}*/
 		node.getChildNodes();
-		int bestUtility = Integer.MIN_VALUE;
+		int bestUtility = - INF;
 		
 		// for each child, find it's utility
 		for (Node childNode : node.childNodes) {
@@ -63,13 +56,8 @@ public class MinimaxMoveFinder extends MoveFinder {
 			return node.utility;
 		}
 		
-		// for each child, find it's utility
-		/*node.getChildJumpNodes();
-		if (node.childNodes.size() == 0) {
-			node.getChildPlaceNodes();
-		}*/
 		node.getChildNodes();
-		int worstUtility = Integer.MAX_VALUE;
+		int worstUtility = INF;
 		
 		for (Node childNode : node.childNodes) {
 			int utility = maxi(childNode, depth - 1);

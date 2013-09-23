@@ -4,7 +4,7 @@ import java.io.PrintStream;
 
 //import csproj.jumper.*
 
-public class Mbrunton implements Player, Piece {
+public class BotPlayer implements Player, Piece {
     Gameboard gb;
     int player;
     boolean illegalOpponentMoveFlag;
@@ -27,44 +27,12 @@ public class Mbrunton implements Player, Piece {
         
         return SUCCESS;
     }
-    
-    /* just for debugging purposes */
-    public int init(int n, int p, String boardString) {
-    	if (n <= 0 || (p != WHITE && p != BLACK)) {
-            return FAILURE;
-        }
-    	
-    	gb = new Gameboard(n, boardString);
-    	player = p;
-    	illegalOpponentMoveFlag = false;
-    	moveFinder = new MinimaxAlphaBetaMoveFinder(gb.n, player);
-    	return SUCCESS;
-    }
-    
-    /* for comparing different MoveFinders */
-    public int init(int n, int p, MoveFinder moveFinder) {
-    	if (n <= 0 || (p != WHITE && p != BLACK)) {
-            return FAILURE;
-        }
-    	
-    	gb = new Gameboard(n);
-    	player = p;
-    	illegalOpponentMoveFlag = false;
-    	this.moveFinder = moveFinder;
-    	return SUCCESS;
-    }
 
     /* Decide on a move to make, apply it to Gameboard, and
      * return Move object
      */
     public Move makeMove() {
     	Move m = moveFinder.getMove(gb);
-    	
-    	// DEBUGGING
-    	if (!gb.isLegalMove(m)) {
-    		System.out.println("Warning, about to self-apply illegal move:");
-    	}
-    	
     	gb.applyMove(m);
     	return m;
     }
@@ -100,6 +68,25 @@ public class Mbrunton implements Player, Piece {
      */
     public void printBoard(PrintStream output) {
     	output.println(gb.toString());
+    }
+    
+    
+    /* functions to help with optimisation
+     */
+    public void setBoard(Gameboard gb) {
+    	this.gb = gb;
+    }
+    
+    public void setMoveFinder(MoveFinder moveFinder) {
+    	this.moveFinder = moveFinder;
+    }
+    
+    public void setEvaluator(BoardEvaluator evaluator) {
+    	moveFinder.setEvaluator(evaluator);
+    }
+    
+    public void setMaxDepth(int maxDepth) {
+    	moveFinder.setMaxDepth(maxDepth);
     }
 }
 

@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 
 /* scratch-space for unit testing rest of project */
 
@@ -18,8 +17,9 @@ public class UnitTester implements Piece {
 							 "------" +
 							 "------";
 		
-		Mbrunton bot = new Mbrunton();
-		bot.init(n, WHITE, boardString);
+		BotPlayer bot = new BotPlayer();
+		bot.init(n, WHITE);
+		bot.setBoard(new Gameboard(n, boardString));
 		
 		int[] rowPositions = {0,0};
 		int[] colPositions = {0,2};

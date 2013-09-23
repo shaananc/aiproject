@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Random;
 
 /* Mitchell Brunton - mbrunton
    Shaanan Cohney   - sncohney
@@ -30,6 +31,7 @@ public class Gameboard implements Piece {
 	public Gameboard(Gameboard aGameboard) {
 		this.n = aGameboard.n;
 		this.board = new int[n*n];
+		
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				board[i*n + j] = aGameboard.board[i*n + j];
@@ -136,7 +138,7 @@ public class Gameboard implements Piece {
 			if (testBoard.board[next_i * n + next_j] != EMPTY) {
 				return false;
 			}
-			// apply move to testBoard
+			// apply single jump to testBoard
 			if (testBoard.board[jumped_i * n + jumped_j] != m.P) {
 				testBoard.board[jumped_i * n + jumped_j] = DEAD;
 			}
@@ -148,7 +150,8 @@ public class Gameboard implements Piece {
 		return true;
 	}
 	
-	/* apply Move m to this gameboard */
+	// apply Move m to this gameboard
+	// assume Move is legal
 	public void applyMove(Move m) {
 		int i = m.RowPositions[0];
 		int j = m.ColPositions[0];
@@ -172,14 +175,8 @@ public class Gameboard implements Piece {
 		}
 	}
 	
-	// create copy of current board, apply move and return copy
-	public Gameboard applyMoveToChildBoard(Move m) {
-		Gameboard childBoard = newInstance(this);
-		childBoard.applyMove(m);
-		return childBoard;
-	}
-	
 	public int getWinner() {
+		
 		int numWhite = 0;
 		int numBlack = 0;
 		
@@ -187,7 +184,6 @@ public class Gameboard implements Piece {
 			for (int j = 0; j < n; j++) {
 				switch (board[i * n + j]) {
 				case EMPTY:
-					// game hasn't finished
 					return EMPTY;
 				case BLACK:
 					numBlack++;
@@ -258,6 +254,126 @@ public class Gameboard implements Piece {
 		}
 
 		return neighbourPairs;
+	}
+	
+	public int getDensity() {
+		int density = 0;
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				if (board[i * n + j] != EMPTY) {
+					density++;
+				}
+			}
+		}
+		
+		return density;
+	}
+	
+	// calculate if the player piece at location (i,j) is jumpable
+	public boolean isJumpable(int i, int j, int player) {
+		if (board[i*n + j] != player) {
+			return false;
+		}
+		
+		boolean hasUpper = i-1 >= 0;
+		boolean hasLower = i+1 < n;
+		boolean hasLeft = j-1 >= 0;
+		boolean hasRight = j+1 < n;
+		
+		// top-left and bottom-right
+		if (hasUpper && hasLeft && hasLower && hasRight) {
+			if (board[(i-1)*n + (j-1)] == EMPTY) {
+				if (board[(i+1)*n + (j+1)] != player) {
+					if (board[(i+1)*n + (j+1)] != DEAD) {
+						return true;
+					}
+				}
+			} else if (board[(i-1)*n + (j-1)] != player) {
+				if (board[(i-1)*n + (j-1)] != DEAD) {
+					if (board[(i+1)*n + (j+1)] == EMPTY) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		// top and bottom
+		if (hasUpper && hasLower) {
+			if (board[(i-1)*n + j] == EMPTY) {
+				if (board[(i+1)*n + j] != player) {
+					if (board[(i+1)*n + j] != DEAD) {
+						return true;
+					}
+				}
+			} else if (board[(i-1)*n + j] != player) {
+				if (board[(i-1)*n + j] != DEAD) {
+					if (board[(i+1)*n + j] == EMPTY) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		// top-right and bottom-left
+		if (hasUpper && hasRight && hasLower && hasLeft) {
+			if (board[(i-1)*n + (j+1)] == EMPTY) {
+				if (board[(i+1)*n + (j-1)] != player) {
+					if (board[(i+1)*n + (j-1)] != DEAD) {
+						return true;
+					}
+				}
+			} else if (board[(i-1)*n + (j+1)] != player) {
+				if (board[(i-1)*n + (j+1)] != DEAD) {
+					if (board[(i+1)*n + (j-1)] == EMPTY) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		// left and right
+		if (hasLeft && hasRight) {
+			if (board[i*n + (j-1)] == EMPTY) {
+				if (board[i*n + (j+1)] != player) {
+					if (board[i*n + (j+1)] != DEAD) {
+						return true;
+					}
+				}
+			} else if (board[i*n + (j-1)] != player) {
+				if (board[i*n + (j-1)] != DEAD) {
+					if (board[i*n + (j+1)] == EMPTY) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		// can't be jumped
+		return false;
+	}
+	
+	// return a random nxn Gameboard
+	public static Gameboard getRandomBoard(int n) {
+		StringBuffer buffer = new StringBuffer(n*n);
+		Random rand = new Random();
+		for (int i = 0; i < n*n; i++) {
+			switch (rand.nextInt(4)) {
+			case 0:
+				buffer.append('-');
+				break;
+			case 1:
+				buffer.append('B');
+				break;
+			case 2:
+				buffer.append('W');
+				break;
+			case 3:
+				buffer.append('X');
+				break;
+			}
+		}
+		
+		return new Gameboard(n, buffer.toString());
 	}
 	
 	public String toString() {

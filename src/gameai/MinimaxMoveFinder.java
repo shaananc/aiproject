@@ -4,7 +4,7 @@ package gameai;
 
 public class MinimaxMoveFinder extends MoveFinder {
 	
-	public static final int MAX_DEPTH = 6;
+	public static final int MAX_DEPTH = 3;
 	
 	public MinimaxMoveFinder(int n, int player) {
 		super(n, player);

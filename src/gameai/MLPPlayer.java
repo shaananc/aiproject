@@ -6,8 +6,10 @@ package gameai;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.sql.Time;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.Stack;
 import org.encog.engine.network.activation.ActivationSigmoid;
 import org.encog.ml.train.MLTrain;
@@ -37,23 +39,18 @@ public class MLPPlayer implements Player {
     boolean isLearning;
     Stack<GameBoard> priorStates;
 
+    double epsilon = 0.1;
+    
     public MLPPlayer(int n) {
 
         n_inputs = 3 * n * n + 3;
 
-        File f = new File("encognn.eg");
-        if (f.exists()) {
-            network = (BasicNetwork) EncogDirectoryPersistence.loadObject(new File("encognn.eg"));
-        } else {
-            network = new BasicNetwork();
-            network.addLayer(new BasicLayer(new ActivationSigmoid(), true, n_inputs));
-            network.addLayer(new BasicLayer(new ActivationSigmoid(), true, 3 * n));
-            network.addLayer(new BasicLayer(new ActivationSigmoid(), true, 2));
-            network.getStructure().finalizeStructure();
-            network.reset();
-
-        }
-
+        network = new BasicNetwork();
+        network.addLayer(new BasicLayer(new ActivationSigmoid(), true, n_inputs));
+        network.addLayer(new BasicLayer(new ActivationSigmoid(), true, n*n/2));
+        network.addLayer(new BasicLayer(new ActivationSigmoid(), true, 2));
+        network.getStructure().finalizeStructure();
+        network.reset();
 
         isLearning = true;
 
@@ -156,6 +153,14 @@ public class MLPPlayer implements Player {
             }
 
         }
+        
+        if(isLearning){
+            Random gen = (new Random());
+            if(gen.nextFloat() < epsilon){
+                int move_index = gen.nextInt(moves.size());
+                bestMove = moves.get(move_index);
+            }
+        }
 
 
         Move m = MoveConverter.InternaltoExternal(bestMove, n, playerId);
@@ -228,6 +233,7 @@ public class MLPPlayer implements Player {
 
             trainingSet = new BasicNeuralDataSet(training_input, training_output);
             train = new Backpropagation(network, trainingSet, 0.4, 0.9);
+            //train = new ResilientPropagation(network, trainingSet);
             train.iteration();
             train.finishTraining();
 

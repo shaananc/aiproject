@@ -6,17 +6,16 @@ package gameai;
 
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Random;
 
 /**
  *
  * @author shaananc
  */
-public class NegaPlayer implements Player, Piece {
-
+public class RandomPlayer implements Player{
     GameBoard state;
     int playerId;
     
-    int maxDepth = 3;
 
     @Override
     public int getWinner() {
@@ -62,9 +61,11 @@ public class NegaPlayer implements Player, Piece {
             state = state.executeMove(refMove);
             return refMove;
         }
-
-        List<InternalMove> moves = new NegaScout(playerId,maxDepth).chooseMove(state);
-
+        
+        
+        Random r = new Random();
+        List<List<InternalMove>> legal_moves = state.getMoves();
+        List<InternalMove> moves = legal_moves.get(r.nextInt(legal_moves.size()));
 
 
         int i = 0;
@@ -114,4 +115,5 @@ public class NegaPlayer implements Player, Piece {
         state = state.executeMove(m);
         return 1;
     }
+    
 }

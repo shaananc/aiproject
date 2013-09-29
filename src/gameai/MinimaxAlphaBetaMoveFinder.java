@@ -3,7 +3,7 @@ package gameai;
 
 public class MinimaxAlphaBetaMoveFinder extends MoveFinder {
 
-	public int MAX_DEPTH = 5;
+	public int MAX_DEPTH = 3;
 	
 	public MinimaxAlphaBetaMoveFinder(int n, int player) {
 		super(n, player);

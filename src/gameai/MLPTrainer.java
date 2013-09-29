@@ -24,60 +24,76 @@ public class MLPTrainer {
     public String FILENAME = "encognn.eg";
 
     public void run() {
-        MLPTrainer trainer = new MLPTrainer();
 
         Player MLP1 = (Player) myMLPPlayer;
         Player MLP2 = (Player) myMLPPlayer2;
         Player NP = (Player) new NegaPlayer();
+        Player Random = (Player) new RandomPlayer();
         Player MitchP = (Player) new Mbrunton();
         Player Human = (Player) new HumanPlayer();
 
-        
+
         int i = 0;
-        while (i <= 10000) {
+        while (i <= 3000) {
             if (i % 500 == 0) {
-                trainer.myMLPPlayer.isLearning = false;
-                trainer.myMLPPlayer2.isLearning = false;
+                myMLPPlayer.isLearning = false;
+                myMLPPlayer2.isLearning = false;
 
+
+                String w1 = playGame(MLP1, NP, true);
+                String w2 = playGame(MLP1, MitchP, true);
+                String w3 = playGame(MLP1, Random, true);
+                System.out.println("Versus NegaPlayer: " + w1);
+                System.out.println("Versus MitchPlayer: " + w2);
+                System.out.println("Versus Random: " + w3);
                 
-                System.out.println("Versus NegaPlayer: " + trainer.playGame(MLP1, NP));
-                System.out.println("Versus MitchPlayer: " + trainer.playGame(MLP1, MitchP));
+                if(w1.equals("White") && w2.equals("White")){
+                    break;
+                }
 
-                trainer.myMLPPlayer2.isLearning = true;
-                trainer.myMLPPlayer.isLearning = true;
+                myMLPPlayer2.isLearning = true;
+                myMLPPlayer.isLearning = true;
 
                 System.out.println(i);
-                
-                EncogDirectoryPersistence.saveObject(new File(FILENAME), trainer.myMLPPlayer.network);
+
 
 
             } else {
-                trainer.playGame(MLP1, MLP2);
-                trainer.playGame(MLP1, NP);
-                
-                //trainer.playGame(MLP1, MitchP);
-                //trainer.playGame(NP, MLP1);
-                //trainer.playGame(MitchP, MLP1);
+                playGame(MLP1, MLP2, false);
+                //playGame(MLP1, NP, false);
+                //playGame(MLP1, MitchP, false);
+                // playGame(NP, MLP1,false);
+                //playGame(MitchP, MLP1,false);
             }
 
-                
+
 
 
             System.out.flush();
             i++;
         }
 
+        System.out.println(myMLPPlayer.network.dumpWeights());
+        EncogDirectoryPersistence.saveObject(new File(FILENAME), myMLPPlayer.network);
+        //BasicNetwork network = (BasicNetwork) EncogDirectoryPersistence.loadObject(new File(FILENAME));
+        //System.out.println(network.dumpWeights());
         Encog.getInstance().shutdown();
 
     }
 
     public MLPTrainer() {
-        BasicNetwork network = (BasicNetwork) EncogDirectoryPersistence.loadObject(new File(FILENAME));
-        myMLPPlayer = new MLPPlayer(n,network);
+        try {
+            BasicNetwork network = (BasicNetwork) EncogDirectoryPersistence.loadObject(new File(FILENAME));
+            myMLPPlayer = new MLPPlayer(n, network);
+            System.out.println(myMLPPlayer.network.dumpWeights());
+
+        } catch (Exception e) {
+            myMLPPlayer = new MLPPlayer(n);
+        }
         myMLPPlayer2 = new MLPPlayer(n, myMLPPlayer.network);
     }
 
-  public String playWithOutput(Player P1, Player P2) {
+    public String playWithOutput(Player P1, Player P2) {
 
         lastPlayedMove = new Move();
         int NumberofMoves = 0;
@@ -169,14 +185,14 @@ public class MLPTrainer {
         }
 
         //return winner;
-        
+
         System.out.println("Player two (Black) indicate winner as: " + P2.getWinner());
         System.out.println("Total Number of Moves Played in the Game: " + NumberofMoves);
         System.out.println("Referee Finished !");
         return winner;
     }
 
-    public String playGame(Player P1, Player P2) {
+    public String playGame(Player P1, Player P2, boolean showBoard) {
 
         lastPlayedMove = new Move();
         int NumberofMoves = 0;
@@ -250,8 +266,11 @@ public class MLPTrainer {
         //System.out.println("P2 Board is :");
         //P2.printBoard(System.out);
         //System.out.println("Board is :");
-        //P1.printBoard(System.out);
 
+        if (showBoard) {
+            P1.printBoard(System.out);
+            P2.getWinner();
+        }
         String winner = "";
 
 
@@ -268,14 +287,16 @@ public class MLPTrainer {
         }
 
         return winner;
-        
+
         //System.out.println("Player two (Black) indicate winner as: " + P2.getWinner());
         //System.out.println("Total Number of Moves Played in the Game: " + NumberofMoves);
         //System.out.println("Referee Finished !");
     }
 
     public static void main(String args[]) {
-        MLPTrainer trainer = new MLPTrainer();
-        trainer.run();
+        while (true) {
+            MLPTrainer trainer = new MLPTrainer();
+            trainer.run();
+        }
     }
 }

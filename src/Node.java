@@ -11,20 +11,20 @@ public class Node implements Piece {
 	Node parentNode;
 	ArrayList<Node> childNodes;
 
-	MitchBoard gb;
+	GameBoardMitch gb;
 	int whosTurn;
 	Move lastMove;
 	int utility;
 	
 	// default constructor
-	public Node(MitchBoard gb) {
+	public Node(GameBoardMitch gb) {
 		this.gb = gb;
 		this.childNodes = new ArrayList<Node>();
 		this.utility = INVALID;
 	}
 	
 	// constructor for root node
-	public Node(MitchBoard gb, int whosTurn) {
+	public Node(GameBoardMitch gb, int whosTurn) {
 		this(gb);
 		
 		this.parentNode = null;
@@ -33,7 +33,7 @@ public class Node implements Piece {
 	}
 	
 	// constructor for non-root node, lastMove is move which created this node
-	public Node(Node parentNode, MitchBoard gb, Move lastMove) {
+	public Node(Node parentNode, GameBoardMitch gb, Move lastMove) {
 		this(gb);
 		
 		this.parentNode = parentNode;
@@ -73,7 +73,7 @@ public class Node implements Piece {
 					int[] colPositions = {j};
 					
 					Move placeMove = new Move(whosTurn, true, rowPositions, colPositions);
-					MitchBoard childBoard = gb.applyMoveToChildBoard(placeMove);
+					GameBoardMitch childBoard = gb.applyMoveToChildBoard(placeMove);
 					this.childNodes.add(new Node(this, childBoard, placeMove));
 				}
 			}
@@ -99,7 +99,7 @@ public class Node implements Piece {
 		}
 	}
 	
-	public void getChildJumpNodesFromPos(MitchBoard newBoard, int i, int j, ArrayList<Integer> rowList, ArrayList<Integer> colList) {
+	public void getChildJumpNodesFromPos(GameBoardMitch newBoard, int i, int j, ArrayList<Integer> rowList, ArrayList<Integer> colList) {
 		
 		ArrayList<NeighbourPair> neighbourPairs = newBoard.getNeighbourPairs(i, j);
 		
@@ -110,7 +110,7 @@ public class Node implements Piece {
 				rowList.add(pair.nni);
 				colList.add(pair.nnj);
 				Move jumpMove = createMoveFromArrayLists(false, rowList, colList);
-				MitchBoard childBoard = MitchBoard.newInstance(newBoard);
+				GameBoardMitch childBoard = GameBoardMitch.newInstance(newBoard);
 				childBoard.board[pair.nni * gb.n + pair.nnj] = whosTurn;
 				if (childBoard.board[pair.ni * gb.n + pair.nj] != whosTurn) {
 					childBoard.board[pair.ni * gb.n + pair.nj] = DEAD; 

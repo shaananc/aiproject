@@ -9,12 +9,12 @@ import java.util.ArrayList;
    in one of four states
 */
 
-public class MitchBoard implements Piece {
+public class GameBoardMitch implements Piece, GameBoard {
 	int n;
 	int[] board;
 	
 	// empty board constructor
-	public MitchBoard(int n) {
+	public GameBoardMitch(int n) {
 
 		this.n = n;		// create (n x n) board of empty cells
 		board = new int[n*n];
@@ -27,7 +27,7 @@ public class MitchBoard implements Piece {
 	}
 	
 	// copy constructor
-	public MitchBoard(MitchBoard aGameboard) {
+	public GameBoardMitch(GameBoardMitch aGameboard) {
 		this.n = aGameboard.n;
 		this.board = new int[n*n];
 		for (int i = 0; i < n; i++) {
@@ -38,7 +38,7 @@ public class MitchBoard implements Piece {
 	}
 	
 	// string-to-board constructor (expects String with no whitespace)
-	public MitchBoard(int n, String boardString) {
+	public GameBoardMitch(int n, String boardString) {
 		this(n);
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
@@ -64,8 +64,8 @@ public class MitchBoard implements Piece {
 	}
 	
 	// creates a copy of current gameboard and returns it
-	public static MitchBoard newInstance(MitchBoard aGameboard) {
-		return new MitchBoard(aGameboard);
+	public static GameBoardMitch newInstance(GameBoardMitch aGameboard) {
+		return new GameBoardMitch(aGameboard);
 	}
 	
 	public boolean isLegalMove(Move m) {
@@ -94,7 +94,7 @@ public class MitchBoard implements Piece {
 	public boolean isLegalJumpMove(Move m) {
 
 		// create a scrap board to test move on
-		MitchBoard testBoard = newInstance(this);
+		GameBoardMitch testBoard = newInstance(this);
 
 		int len = m.RowPositions.length;
 		if (m.ColPositions.length != len || len < 2) {
@@ -173,8 +173,8 @@ public class MitchBoard implements Piece {
 	}
 	
 	// create copy of current board, apply move and return copy
-	public MitchBoard applyMoveToChildBoard(Move m) {
-		MitchBoard childBoard = newInstance(this);
+	public GameBoardMitch applyMoveToChildBoard(Move m) {
+		GameBoardMitch childBoard = newInstance(this);
 		childBoard.applyMove(m);
 		return childBoard;
 	}
@@ -286,4 +286,36 @@ public class MitchBoard implements Piece {
 		
 		return boardStringBuffer.toString();
 	}
+
+    @Override
+    public boolean isWhite(int loc) {
+        return board[loc] == WHITE;
+    }
+
+    @Override
+    public boolean isBlack(int loc) {
+        return board[loc] == BLACK;
+    }
+
+    @Override
+    public boolean isEmpty(int loc) {
+       return board[loc] == EMPTY;
+    }
+
+    @Override
+    public boolean isDead(int loc) {
+        return board[loc] == DEAD;
+    }
+
+    @Override
+    public boolean isSameColor(int loc1, int loc2) {
+        return board[loc1] == board[loc2];
+    }
+
+    @Override
+    public boolean isFull(int loc) {
+        return board[loc] != EMPTY;
+    }
+
+
 }

@@ -8,7 +8,7 @@ public class StaticBoardEvaluator extends BoardEvaluator {
 	}
 
 	@Override
-	public int evaluate(MitchBoard gb, int player) {
+	public int evaluate(GameBoardMitch gb, int player) {
 		int numPlayer = 0;
 		int numEnemy = 0;
 		for (int i = 0; i < n; i++) {

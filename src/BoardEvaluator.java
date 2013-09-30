@@ -10,7 +10,7 @@ public abstract class BoardEvaluator implements Piece {
 		this.player = player;
 	}
 	
-	public abstract int evaluate(Gameboard gb, int player);
+	public abstract int evaluate(MitchBoard gb, int player);
 	
 	public int evaluate(Node node) {
 		return evaluate(node.gb, player);

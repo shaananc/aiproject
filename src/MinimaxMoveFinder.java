@@ -9,7 +9,7 @@ public class MinimaxMoveFinder extends MoveFinder {
 	}
 
 	@Override
-	public Move getMove(Gameboard gb) {	
+	public Move getMove(MitchBoard gb) {	
 		// turn current Gameboard into a root node for search tree
 		Node root = new Node(gb, player);
 		

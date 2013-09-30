@@ -10,7 +10,7 @@ public class StupidMoveFinder extends MoveFinder {
 	}
 
 	@Override
-	public Move getMove(Gameboard gb) {
+	public Move getMove(MitchBoard gb) {
 		
 		for (int i = 0; i < gb.n; i++) {
     		for (int j = 0; j < gb.n; j++) {

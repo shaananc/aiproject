@@ -13,7 +13,7 @@ public class MinimaxAlphaBetaMoveFinder extends MoveFinder {
 	}
 
 	@Override
-	public Move getMove(Gameboard gb) {
+	public Move getMove(MitchBoard gb) {
 		
 		Node root = new Node(gb, player);
 		

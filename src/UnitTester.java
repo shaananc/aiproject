@@ -40,7 +40,7 @@ public class UnitTester implements Piece {
 							 "------" +
 							 "------";
 		
-		Gameboard gb = new Gameboard(n, boardString);
+		MitchBoard gb = new MitchBoard(n, boardString);
 		System.out.println("Original Gameboard:");
 		System.out.println(gb);
 		

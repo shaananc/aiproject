@@ -11,5 +11,5 @@ public abstract class MoveFinder implements Piece {
 		evaluator = new StaticBoardEvaluator(n, player);
 	}
 	
-	public abstract Move getMove(Gameboard gb);
+	public abstract Move getMove(MitchBoard gb);
 }

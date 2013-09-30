@@ -9,12 +9,12 @@ import java.util.ArrayList;
    in one of four states
 */
 
-public class Gameboard implements Piece {
+public class MitchBoard implements Piece {
 	int n;
 	int[] board;
 	
 	// empty board constructor
-	public Gameboard(int n) {
+	public MitchBoard(int n) {
 
 		this.n = n;		// create (n x n) board of empty cells
 		board = new int[n*n];
@@ -27,7 +27,7 @@ public class Gameboard implements Piece {
 	}
 	
 	// copy constructor
-	public Gameboard(Gameboard aGameboard) {
+	public MitchBoard(MitchBoard aGameboard) {
 		this.n = aGameboard.n;
 		this.board = new int[n*n];
 		for (int i = 0; i < n; i++) {
@@ -38,7 +38,7 @@ public class Gameboard implements Piece {
 	}
 	
 	// string-to-board constructor (expects String with no whitespace)
-	public Gameboard(int n, String boardString) {
+	public MitchBoard(int n, String boardString) {
 		this(n);
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
@@ -64,8 +64,8 @@ public class Gameboard implements Piece {
 	}
 	
 	// creates a copy of current gameboard and returns it
-	public static Gameboard newInstance(Gameboard aGameboard) {
-		return new Gameboard(aGameboard);
+	public static MitchBoard newInstance(MitchBoard aGameboard) {
+		return new MitchBoard(aGameboard);
 	}
 	
 	public boolean isLegalMove(Move m) {
@@ -94,7 +94,7 @@ public class Gameboard implements Piece {
 	public boolean isLegalJumpMove(Move m) {
 
 		// create a scrap board to test move on
-		Gameboard testBoard = newInstance(this);
+		MitchBoard testBoard = newInstance(this);
 
 		int len = m.RowPositions.length;
 		if (m.ColPositions.length != len || len < 2) {
@@ -173,8 +173,8 @@ public class Gameboard implements Piece {
 	}
 	
 	// create copy of current board, apply move and return copy
-	public Gameboard applyMoveToChildBoard(Move m) {
-		Gameboard childBoard = newInstance(this);
+	public MitchBoard applyMoveToChildBoard(Move m) {
+		MitchBoard childBoard = newInstance(this);
 		childBoard.applyMove(m);
 		return childBoard;
 	}

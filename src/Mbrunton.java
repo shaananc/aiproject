@@ -5,7 +5,7 @@ import java.io.PrintStream;
 //import csproj.jumper.*
 
 public class Mbrunton implements Player, Piece {
-    Gameboard gb;
+    MitchBoard gb;
     int player;
     boolean illegalOpponentMoveFlag;
     MoveFinder moveFinder;
@@ -20,7 +20,7 @@ public class Mbrunton implements Player, Piece {
             return FAILURE;
         }
 
-        gb = new Gameboard(n);
+        gb = new MitchBoard(n);
         player = p;
         illegalOpponentMoveFlag = false;
         moveFinder = new MinimaxAlphaBetaMoveFinder(n, p);
@@ -34,7 +34,7 @@ public class Mbrunton implements Player, Piece {
             return FAILURE;
         }
     	
-    	gb = new Gameboard(n, boardString);
+    	gb = new MitchBoard(n, boardString);
     	player = p;
     	illegalOpponentMoveFlag = false;
     	moveFinder = new MinimaxAlphaBetaMoveFinder(gb.n, player);
@@ -47,7 +47,7 @@ public class Mbrunton implements Player, Piece {
             return FAILURE;
         }
     	
-    	gb = new Gameboard(n);
+    	gb = new MitchBoard(n);
     	player = p;
     	illegalOpponentMoveFlag = false;
     	this.moveFinder = moveFinder;

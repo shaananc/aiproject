@@ -38,16 +38,17 @@ public class MLPPlayer implements Player {
     BasicNetwork network;
     boolean isLearning;
     Stack<GameBoard> priorStates;
-
     double epsilon = 0.1;
-    
+    public final String FILENAME = "encognn.eg";
+
     public MLPPlayer(int n) {
+
 
         n_inputs = 3 * n * n + 3;
 
         network = new BasicNetwork();
         network.addLayer(new BasicLayer(new ActivationSigmoid(), true, n_inputs));
-        network.addLayer(new BasicLayer(new ActivationSigmoid(), true, n*n/2));
+        network.addLayer(new BasicLayer(new ActivationSigmoid(), true, 60));
         network.addLayer(new BasicLayer(new ActivationSigmoid(), true, 2));
         network.getStructure().finalizeStructure();
         network.reset();
@@ -55,6 +56,16 @@ public class MLPPlayer implements Player {
         isLearning = true;
 
         priorStates = new Stack<GameBoard>();
+
+
+        try {
+            network = (BasicNetwork) EncogDirectoryPersistence.loadObject(new File(FILENAME));
+            isLearning = false;
+        } catch (Exception e) {
+            
+        }
+
+
 
     }
 
@@ -153,10 +164,10 @@ public class MLPPlayer implements Player {
             }
 
         }
-        
-        if(isLearning){
+
+        if (isLearning) {
             Random gen = (new Random());
-            if(gen.nextFloat() < epsilon){
+            if (gen.nextFloat() < epsilon) {
                 int move_index = gen.nextInt(moves.size());
                 bestMove = moves.get(move_index);
             }

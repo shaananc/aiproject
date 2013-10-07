@@ -1,8 +1,5 @@
 package gameai;
 
-import gameai.Move;
-import gameai.Player;
-
 /*   
  *   Referee:
  *      A mediator between two players. It is responsible to initialize 

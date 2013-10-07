@@ -18,7 +18,7 @@ import org.encog.persist.EncogDirectoryPersistence;
 public class MLPTrainer {
 
     private static Move lastPlayedMove;
-    int n = 4;
+    int n = 6;
     public MLPPlayer myMLPPlayer;
     public MLPPlayer myMLPPlayer2;
     public String FILENAME = "encognn.eg";
@@ -34,7 +34,7 @@ public class MLPTrainer {
 
 
         int i = 0;
-        while (i <= 3000) {
+        while (i <= 300000) {
             if (i % 500 == 0) {
                 myMLPPlayer.isLearning = false;
                 myMLPPlayer2.isLearning = false;

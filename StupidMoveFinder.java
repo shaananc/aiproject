@@ -14,16 +14,19 @@ public class StupidMoveFinder extends MoveFinder {
 		
 		for (int i = 0; i < gb.n; i++) {
     		for (int j = 0; j < gb.n; j++) {
-    			int[] r = {i};
-    			int[] c = {j};
-    			Move stupidMove = new Move(player, true, r, c);
-    			if (gb.isLegalMove(stupidMove)) {
-    				gb.applyMove(stupidMove);
-    				return stupidMove;
+    			if (gb.board[i*n + j] == EMPTY) {
+    				int[] r = {i};
+        			int[] c = {j};
+        			return new Move(player, true, r, c);
     			}
     		}
     	}
     	return null;
+	}
+	
+	// TODO
+	public double getTrueUtility(Node node) {
+		return evaluate(node);
 	}
 
 }

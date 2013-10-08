@@ -12,7 +12,7 @@ public class MinimaxMoveFinder extends MoveFinder {
 		Node root = new Node(gb, player);
 		
 		// call minimax function on root node
-		int maxUtility = maxi(root, MAX_DEPTH);
+		double maxUtility = maxi(root, MAX_DEPTH);
 		
 		// find child of root with same utility value, and return corresponding move
 		for (Node childNode : root.childNodes) {
@@ -25,20 +25,24 @@ public class MinimaxMoveFinder extends MoveFinder {
 		return null;
 	}
 	
-	public int maxi(Node node, int depth) {
+	public double getTrueUtility(Node node) {
+		return maxi(node, MAX_DEPTH);
+	}
+	
+	public double maxi(Node node, int depth) {
 		
 		// if we've hit a terminal node, or reached max search depth, return node utility
 		if (node.gb.getWinner() != EMPTY || depth <= 0) {
-			node.utility = evaluator.evaluate(node);
+			node.utility = evaluate(node);
 			return node.utility;
 		}
 		
 		node.getChildNodes();
-		int bestUtility = - INF;
+		double bestUtility = - INF;
 		
 		// for each child, find it's utility
 		for (Node childNode : node.childNodes) {
-			int utility = mini(childNode, depth - 1);
+			double utility = mini(childNode, depth - 1);
 			if (utility > bestUtility) {
 				bestUtility = utility;
 			}
@@ -49,18 +53,18 @@ public class MinimaxMoveFinder extends MoveFinder {
 		return bestUtility;
 	}
 	
-	public int mini(Node node, int depth) {
+	public double mini(Node node, int depth) {
 
 		if (node.gb.getWinner() != EMPTY || depth <= 0) {
-			node.utility = evaluator.evaluate(node);
+			node.utility = evaluate(node);
 			return node.utility;
 		}
 		
 		node.getChildNodes();
-		int worstUtility = INF;
+		double worstUtility = INF;
 		
 		for (Node childNode : node.childNodes) {
-			int utility = maxi(childNode, depth - 1);
+			double utility = maxi(childNode, depth - 1);
 			if (utility < worstUtility) {
 				worstUtility = utility;
 			}

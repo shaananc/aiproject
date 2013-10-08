@@ -1,12 +1,11 @@
 import java.util.ArrayList;
 
-/* my implementation of referee class for jumper game
-   until one provided by tutor makes an appearance
+/* Mitchell Brunton's implementation of referee class for jumper game
 */
 
 public class TestingStation implements Piece {
-    // TODO TODO TODO: merge BoardEvaluator into MoveFinder!!!!!!!!!!!!
-    public static void main(String[] args) {
+
+	public static void main(String[] args) {
     	int n = 6;
     	BotPlayer p1 = new BotPlayer();
     	BotPlayer p2 = new BotPlayer();
@@ -17,30 +16,16 @@ public class TestingStation implements Piece {
     	/* experimentation and optimisation */
 		p1.setMoveFinder(new MinimaxAlphaBetaMoveFinder(n, WHITE));
     	p2.setMoveFinder(new MinimaxAlphaBetaMoveFinder(n, BLACK));
-    	
-    	p1.setEvaluator(new AdvancedBoardEvaluator(n, WHITE));
-		p2.setEvaluator(new AdvancedBoardEvaluator(n, BLACK));
+    			
+		p1.setMaxDepth(6);
+		p2.setMaxDepth(6);
 		
-		p1.setMaxDepth(5);
-		p2.setMaxDepth(5);
 		
-		ArrayList<Integer> p1Weights = new ArrayList<Integer>();
-		ArrayList<Integer> p2Weights = new ArrayList<Integer>();
-		
-		p1Weights.add(15);
-		p1Weights.add(10);
-		
-		p2Weights.add(40);
-		p2Weights.add(10);
-		
-		p1.moveFinder.evaluator.setWeights(p1Weights);
-		p2.moveFinder.evaluator.setWeights(p2Weights);
-
-		//p1.setEvalSwitch(1);
-		//p2.setEvalSwitch(1);
-	
-		//p1.setProjUtilSwitch(1);
-		//p2.setProjUtilSwitch(1);
+		/* TODO debug
+		Gameboard randomBoard = Gameboard.getRandomBoard(n);
+		p1.setBoard(randomBoard);
+		p2.setBoard(randomBoard);
+		*/
 
 		boolean printOutput = true;
 		GameResult result = playGame(p1, p2, printOutput);

@@ -12,7 +12,7 @@ public class MinimaxAlphaBetaMoveFinder extends MoveFinder {
 		int beta = INF;
 		
 		boolean isMaximising = true;
-		int bestUtility = minimax(root, alpha, beta, isMaximising, MAX_DEPTH);
+		double bestUtility = minimax(root, alpha, beta, isMaximising, MAX_DEPTH);
 	
 		for (Node childNode : root.childNodes) {
 			if (childNode.utility == bestUtility) {
@@ -24,19 +24,17 @@ public class MinimaxAlphaBetaMoveFinder extends MoveFinder {
 		return null;
 	}
 	
-	// like getMove, but just return utility
-	public int getTrueUtility(Node node) {
+	public double getTrueUtility(Node node) {
 		return minimax(node, -INF, INF, true, MAX_DEPTH);
 	}
 	
-	public int minimax(Node node, int alpha, int beta, boolean isMaximising, int depth) {
+	public double minimax(Node node, double alpha, double beta, boolean isMaximising, int depth) {
 		if (node.gb.getWinner() != EMPTY || depth <= 0) {
-			node.utility = evaluator.evaluate(node);
+			node.utility = evaluate(node);
 			return node.utility;
 		}
 		
-		// pass isMaximising for ordering of nodes (ordered best to worst)
-		node.getChildNodes(isMaximising, evaluator);
+		node.getChildNodes();
 		
 		if (isMaximising) {
 			for (Node childNode : node.childNodes) {

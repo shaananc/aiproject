@@ -12,7 +12,7 @@ public class NegascoutMoveFinder extends MoveFinder {
 		int alpha = - INF;
 		int beta = INF;
 		
-		int bestUtility = negascout(root, alpha, beta, MAX_DEPTH);
+		double bestUtility = negascout(root, alpha, beta, MAX_DEPTH);
 	
 		for (Node childNode : root.childNodes) {
 			if (childNode.utility == bestUtility) {
@@ -24,18 +24,21 @@ public class NegascoutMoveFinder extends MoveFinder {
 		return null;
 	}
 	
-	public int negascout(Node node, int alpha, int beta, int depth) {
+	public double getTrueUtility(Node node) {
+		return negascout(node, -INF, INF, MAX_DEPTH);
+	}
+	
+	public double negascout(Node node, double alpha, double beta, int depth) {
 		if (node.gb.getWinner() != EMPTY || depth <= 0) {
-			node.utility = evaluator.evaluate(node);
+			node.utility = evaluate(node);
 			return node.utility;
 		}
 		
-		boolean isMaximising = true;
-		node.getChildNodes(isMaximising, evaluator);
+		node.getChildNodes();
 		boolean isFirst = true;
 		for (Node childNode : node.childNodes) {
 			// search in null window
-			int score = -negascout(childNode, -alpha - 1, -alpha, depth - 1);
+			double score = -negascout(childNode, -alpha - 1, -alpha, depth - 1);
 			if (alpha < score && score < beta && !isFirst) {
 				// initial search failed, continue with regular alpha beta
 				childNode.resetChildren();

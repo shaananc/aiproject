@@ -52,7 +52,7 @@ public class BotPlayer implements Player, Piece {
     }
 
     /* return state of gameplay - if opponent has made illegal move, return
-     * "invalid" code, otherwise return code for a white/black victory, draw
+     * "invalid", otherwise return value indicating a white/black victory, draw
      * or unfinished game
      */
     public int getWinner() {
@@ -79,10 +79,6 @@ public class BotPlayer implements Player, Piece {
     
     public void setMoveFinder(MoveFinder moveFinder) {
     	this.moveFinder = moveFinder;
-    }
-    
-    public void setEvaluator(BoardEvaluator evaluator) {
-    	moveFinder.setEvaluator(evaluator);
     }
     
     public void setMaxDepth(int maxDepth) {

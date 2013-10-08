@@ -6,8 +6,6 @@ package gameai;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.sql.Time;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
@@ -17,10 +15,7 @@ import org.encog.neural.data.NeuralDataSet;
 import org.encog.neural.data.basic.BasicNeuralDataSet;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
-import org.encog.neural.networks.training.Train;
-import org.encog.neural.networks.training.lma.LevenbergMarquardtTraining;
 import org.encog.neural.networks.training.propagation.back.Backpropagation;
-import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
 import org.encog.persist.EncogDirectoryPersistence;
 
 /**
@@ -40,6 +35,19 @@ public class MLPPlayer implements Player {
     Stack<GameBoard> priorStates;
     double epsilon = 0.1;
     public final String FILENAME = "encognn.eg";
+
+    public MLPPlayer() {
+
+        priorStates = new Stack<GameBoard>();
+
+
+        try {
+            network = (BasicNetwork) EncogDirectoryPersistence.loadObject(new File(FILENAME));
+            isLearning = false;
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
 
     public MLPPlayer(int n) {
 
@@ -62,7 +70,7 @@ public class MLPPlayer implements Player {
             network = (BasicNetwork) EncogDirectoryPersistence.loadObject(new File(FILENAME));
             isLearning = false;
         } catch (Exception e) {
-            
+            System.out.println("Error: " + e.getMessage());
         }
 
 
@@ -135,6 +143,10 @@ public class MLPPlayer implements Player {
 
     @Override
     public int init(int n, int p) {
+
+        n_inputs = 3 * n * n + 3;
+
+
         this.n = n;
         this.playerId = p;
 

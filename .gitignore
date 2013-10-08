@@ -1,12 +1,10 @@
 *.class
 
-# package files
+# Package Files #
 *.jar
 *.war
 *.ear
-
-# tests
-shaanan_test_boards/*
-
-# annoying mac querk
-.DS_Store
+/dist/
+/nbproject/private/
+/build/
+/part_A/

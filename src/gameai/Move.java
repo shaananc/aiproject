@@ -1,5 +1,11 @@
 package gameai;
-//package csproj.jumper;
+/*
+ *   Move:
+ *      Which can be a place or a jump
+ *      
+ *   @author msalehi
+ *   
+ */
 
 public class Move implements Piece {
 	public int P;

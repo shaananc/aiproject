@@ -6,7 +6,7 @@ import java.util.Random;
    Shaanan Cohney   - sncohney
 */
 
-/* Gameboard class represents a snapshot of a game of Jumper
+/* GameBoardMitch class represents a snapshot of a game of Jumper
    Actual board is an array of Cells, each of which can be
    in one of four states
 */
@@ -14,20 +14,20 @@ import java.util.Random;
 public class GameBoardMitch implements Piece, GameBoard {
 	int n;
 	int[] board;
-	
+
 	// empty board constructor
 	public GameBoardMitch(int n) {
 
 		this.n = n;		// create (n x n) board of empty cells
 		board = new int[n*n];
-		
+
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				board[i*n + j] = EMPTY;
 			}
 		}
 	}
-	
+
 	// copy constructor
 	public GameBoardMitch(GameBoardMitch aGameboard) {
 		this.n = aGameboard.n;
@@ -35,11 +35,11 @@ public class GameBoardMitch implements Piece, GameBoard {
 		
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
-				board[i*n + j] = aGameboard.board[i*n + j];
+				board[i*n + j] = aGameBoardMitch.board[i*n + j];
 			}
 		}
 	}
-	
+
 	// string-to-board constructor (expects String with no whitespace)
 	public GameBoardMitch(int n, String boardString) {
 		this(n);
@@ -65,12 +65,12 @@ public class GameBoardMitch implements Piece, GameBoard {
 			}
 		}
 	}
-	
+
 	// creates a copy of current gameboard and returns it
 	public static GameBoardMitch newInstance(GameBoardMitch aGameboard) {
 		return new GameBoardMitch(aGameboard);
 	}
-	
+
 	public boolean isLegalMove(Move m) {
 		if (m.IsPlaceMove) {
 			return isLegalPlaceMove(m);
@@ -78,22 +78,22 @@ public class GameBoardMitch implements Piece, GameBoard {
 			return isLegalJumpMove(m);
 		}
 	}
-	
+
 	public boolean isLegalPlaceMove(Move m) {
 		if (m.RowPositions.length != 1 || m.ColPositions.length != 1) {
 			return false;
 		}
-		
+
 		int i = m.RowPositions[0];
 		int j = m.ColPositions[0];
-		
+
 		if (i < 0 || i >= n || j < 0 || j >= n) {
 			return false;
 		}
-		
+
 		return board[i*n + j] == EMPTY;
 	}
-	
+
 	public boolean isLegalJumpMove(Move m) {
 
 		// create a scrap board to test move on
@@ -103,7 +103,7 @@ public class GameBoardMitch implements Piece, GameBoard {
 		if (m.ColPositions.length != len || len < 2) {
 			return false;
 		}
-		
+
 		int i = m.RowPositions[0];
 		int j = m.ColPositions[0];
 		if (testBoard.board[i * n + j] != m.P){
@@ -112,7 +112,7 @@ public class GameBoardMitch implements Piece, GameBoard {
 		if (i < 0 || i >= n || j < 0 || j >= n) {
 			return false;
 		}
-		
+
 		// always considering single jump from (i,j) to (next_i,next_j), over (jumped_i,jumped_j)		
 		for (int k = 1; k < len; k++) {
 			int next_i = m.RowPositions[k];
@@ -147,7 +147,7 @@ public class GameBoardMitch implements Piece, GameBoard {
 			i = next_i;
 			j = next_j;
 		}
-		
+
 		return true;
 	}
 	
@@ -161,7 +161,7 @@ public class GameBoardMitch implements Piece, GameBoard {
 		} else {	
 			int len = m.RowPositions.length;
 			for (int k = 1; k < len; k++) {
-				
+
 				int next_i = m.RowPositions[k];
 				int next_j = m.ColPositions[k];
 				int jumped_i = i + (next_i - i)/2;
@@ -180,7 +180,7 @@ public class GameBoardMitch implements Piece, GameBoard {
 		
 		int numWhite = 0;
 		int numBlack = 0;
-		
+
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				switch (board[i * n + j]) {
@@ -205,7 +205,7 @@ public class GameBoardMitch implements Piece, GameBoard {
 			return DEAD;
 		}
 	}
-	
+
 	public ArrayList<NeighbourPair> getNeighbourPairs(int i, int j) {
 		boolean hasLeft = j-2 >= 0;
         boolean hasRight = j+2 < n;
@@ -379,7 +379,7 @@ public class GameBoardMitch implements Piece, GameBoard {
 	
 	public String toString() {
 		StringBuffer boardStringBuffer = new StringBuffer( (n+1)*n );	// n+1 for '\n'
-		
+
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
 				int piece = board[i*n + j];
@@ -400,7 +400,7 @@ public class GameBoardMitch implements Piece, GameBoard {
 			}
 			boardStringBuffer.append('\n');
 		}
-		
+
 		return boardStringBuffer.toString();
 	}
 

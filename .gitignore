@@ -8,3 +8,4 @@
 /nbproject/private/
 /build/
 /part_A/
+!/src/gameai/encog-core-3.2.0-SNAPSHOT.jar

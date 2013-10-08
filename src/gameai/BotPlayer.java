@@ -9,6 +9,7 @@ public class BotPlayer implements Player, Piece {
 	GameBoardMitch gb;
     int player;
     boolean illegalOpponentMoveFlag;
+    boolean useQF = false;
     MoveFinder moveFinder;
     public static final int SUCCESS = 0;
     public static final int FAILURE = -1;
@@ -25,6 +26,8 @@ public class BotPlayer implements Player, Piece {
         player = p;
         illegalOpponentMoveFlag = false;
         moveFinder = new MinimaxAlphaBetaMoveFinder(n, p);
+        //moveFinder = new NegascoutMoveFinder(n, player);
+        moveFinder.useQF = useQF;
         
         return SUCCESS;
     }

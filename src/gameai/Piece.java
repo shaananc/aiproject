@@ -1,5 +1,4 @@
 package gameai;
-//package csproj.jumper;
 /*
  *   Piece:
  *      Define types of pieces that can appear on a board

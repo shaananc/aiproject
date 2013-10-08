@@ -2,6 +2,8 @@ package gameai;
 import java.util.ArrayList;
 import java.util.Random;
 
+
+
 /* Mitchell Brunton - mbrunton
    Shaanan Cohney   - sncohney
 */
@@ -35,7 +37,7 @@ public class GameBoardMitch implements Piece, GameBoard {
 		
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
-				board[i*n + j] = aGameBoardMitch.board[i*n + j];
+				board[i*n + j] = aGameboard.board[i*n + j];
 			}
 		}
 	}

@@ -51,8 +51,8 @@ public class MoveConverter {
             cols[i] = m.y;
             i++;
         }
-        refMove.RowPositions = rows;
-        refMove.ColPositions = cols;
+        refMove.ColPositions = rows;
+        refMove.RowPositions = cols;
         refMove.P = playerId;
     
         return refMove ;

@@ -11,8 +11,12 @@ public class TestingStation implements Piece {
     	BotPlayer p1 = new BotPlayer();
     	BotPlayer p2 = new BotPlayer();
     	
+        p1.useQF = true;
     	p1.init(n, WHITE);
+        
+        p2.useQF = true;
     	p2.init(n, BLACK);
+        
 		
     	/* experimentation and optimisation */
 		/*

@@ -13,7 +13,7 @@ import java.util.Random;
  * @author shaananc
  */
 public class RandomPlayer implements Player{
-    GameBoard state;
+    GameBoardShaanan state;
     int playerId;
     
 
@@ -35,8 +35,8 @@ public class RandomPlayer implements Player{
 
     @Override
     public int init(int n, int p) {
-        state = new GameBoard(n);
-        //state.turn = GameBoard.WHITE;
+        state = new GameBoardShaanan(n);
+        //state.turn = GameBoardShaanan.WHITE;
         playerId = p;
         
         return 1;

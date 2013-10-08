@@ -210,24 +210,24 @@ public class GameBoardShaanan implements GameBoard {
 
         if (m.IsPlaceMove) {
             if (m.P == Move.WHITE) {
-                gb.setWhite(m.RowPositions[0] + n * m.ColPositions[0]);
+                gb.setWhite(m.ColPositions[0] + n * m.RowPositions[0]);
             } else {
-                gb.setBlack(m.RowPositions[0] + n * m.ColPositions[0]);
+                gb.setBlack(m.ColPositions[0] + n * m.RowPositions[0]);
             }
         } else {
             int i;
-            for (i = 0; i < m.ColPositions.length - 1; i++) {
-                int signx = m.RowPositions[i] < m.RowPositions[i + 1] ? 1 : -1;
-                int signy = m.ColPositions[i] < m.ColPositions[i + 1] ? 1 : -1;
-                int jumpedx = m.RowPositions[i] + signx * Math.abs(m.RowPositions[i] - m.RowPositions[i + 1]) / 2;
-                int jumpedy = m.ColPositions[i] + signy * Math.abs(m.ColPositions[i] - m.ColPositions[i + 1]) / 2;
+            for (i = 0; i < m.RowPositions.length - 1; i++) {
+                int signx = m.ColPositions[i] < m.ColPositions[i + 1] ? 1 : -1;
+                int signy = m.RowPositions[i] < m.RowPositions[i + 1] ? 1 : -1;
+                int jumpedx = m.ColPositions[i] + signx * Math.abs(m.ColPositions[i] - m.ColPositions[i + 1]) / 2;
+                int jumpedy = m.RowPositions[i] + signy * Math.abs(m.RowPositions[i] - m.RowPositions[i + 1]) / 2;
                 int jumpedloc = jumpedx + n * jumpedy;
 
 
                 if (m.P == Move.WHITE) {
-                    gb.setWhite(m.RowPositions[i + 1] + n * m.ColPositions[i + 1]);
+                    gb.setWhite(m.ColPositions[i + 1] + n * m.RowPositions[i + 1]);
                 } else {
-                    gb.setBlack(m.RowPositions[i + 1] + n * m.ColPositions[i + 1]);
+                    gb.setBlack(m.ColPositions[i + 1] + n * m.RowPositions[i + 1]);
                 }
 
 

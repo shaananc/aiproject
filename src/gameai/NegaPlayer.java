@@ -13,10 +13,10 @@ import java.util.List;
  */
 public class NegaPlayer implements Player, Piece {
 
-    GameBoard state;
+    GameBoardShaanan state;
     int playerId;
     
-    int maxDepth = 3;
+    int maxDepth = 5;
 
     @Override
     public int getWinner() {
@@ -36,7 +36,7 @@ public class NegaPlayer implements Player, Piece {
 
     @Override
     public int init(int n, int p) {
-        state = new GameBoard(n);
+        state = new GameBoardShaanan(n);
         //state.turn = GameBoard.WHITE;
         playerId = p;
         
@@ -94,8 +94,8 @@ public class NegaPlayer implements Player, Piece {
             cols[i] = m.y;
             i++;
         }
-        refMove.RowPositions = rows;
-        refMove.ColPositions = cols;
+        refMove.RowPositions = cols;
+        refMove.ColPositions = rows;
         refMove.P = playerId;
 
         state = state.executeCompound(moves);

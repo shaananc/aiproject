@@ -25,27 +25,27 @@ import org.encog.persist.EncogDirectoryPersistence;
 public class MLPPlayer implements Player {
 
     // currently can only play as white
-    GameBoard state;
+    GameBoardShaanan state;
     int playerId;
     int n;
     int n_inputs;
     //encog network
     BasicNetwork network;
     boolean isLearning;
-    Stack<GameBoard> priorStates;
+    Stack<GameBoardShaanan> priorStates;
     double epsilon = 0.1;
     public final String FILENAME = "encognn.eg";
 
     public MLPPlayer() {
 
-        priorStates = new Stack<GameBoard>();
+        priorStates = new Stack<GameBoardShaanan>();
 
 
         try {
             network = (BasicNetwork) EncogDirectoryPersistence.loadObject(new File(FILENAME));
             isLearning = false;
         } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Error Here: " + e.getMessage());
         }
     }
 
@@ -63,7 +63,7 @@ public class MLPPlayer implements Player {
 
         isLearning = true;
 
-        priorStates = new Stack<GameBoard>();
+        priorStates = new Stack<GameBoardShaanan>();
 
 
         try {
@@ -82,7 +82,7 @@ public class MLPPlayer implements Player {
         this.network = network;
     }
 
-    private double evaluate(GameBoard gb) {
+    private double evaluate(GameBoardShaanan gb) {
         double inputs[] = genInput(gb);
 
         double encog_input[][] = new double[1][n_inputs];
@@ -93,7 +93,7 @@ public class MLPPlayer implements Player {
 
     }
 
-    public double[] genInput(GameBoard gb) {
+    public double[] genInput(GameBoardShaanan gb) {
         double[] inputs = new double[n_inputs];
 
         int input_index = 0;
@@ -111,9 +111,9 @@ public class MLPPlayer implements Player {
             input_index += 3;
         }
 
-        inputs[input_index] = (gb.turn == GameBoard.WHITE ? 1 : 0);
+        inputs[input_index] = (gb.turn == GameBoardShaanan.WHITE ? 1 : 0);
         input_index += 1;
-        inputs[input_index] = (gb.turn == GameBoard.BLACK ? 1 : 0);
+        inputs[input_index] = (gb.turn == GameBoardShaanan.BLACK ? 1 : 0);
 
         input_index += 1;
         inputs[input_index] = 1;
@@ -121,7 +121,7 @@ public class MLPPlayer implements Player {
         return inputs;
     }
 
-    private void print_input(GameBoard gb) {
+    private void print_input(GameBoardShaanan gb) {
         System.out.println(gb);
         double input[] = genInput(gb);
         for (int i = 0; i < input.length;) {
@@ -136,7 +136,6 @@ public class MLPPlayer implements Player {
 
     // when in learning mode:
     //
-    @Override
     public int getWinner() {
         return state.getWinner();
     }
@@ -144,13 +143,15 @@ public class MLPPlayer implements Player {
     @Override
     public int init(int n, int p) {
 
+        isLearning = false;
+        
         n_inputs = 3 * n * n + 3;
 
 
         this.n = n;
         this.playerId = p;
 
-        state = new GameBoard(n);
+        state = new GameBoardShaanan(n);
 
         return 1;
     }
@@ -167,7 +168,7 @@ public class MLPPlayer implements Player {
 
         double eval;
         for (List<InternalMove> move : moves) {
-            GameBoard gb = state.executeCompound(move);
+            GameBoardShaanan gb = state.executeCompound(move);
 
             eval = evaluate(gb);
             if (eval > max) {
@@ -188,7 +189,7 @@ public class MLPPlayer implements Player {
 
         Move m = MoveConverter.InternaltoExternal(bestMove, n, playerId);
 
-        GameBoard new_state = state.executeCompound(bestMove);
+        GameBoardShaanan new_state = state.executeCompound(bestMove);
 
         state = new_state;
 
@@ -203,7 +204,7 @@ public class MLPPlayer implements Player {
 
     @Override
     public int opponentMove(Move m) {
-        GameBoard new_state = state.executeMove(m);
+        GameBoardShaanan new_state = state.executeMove(m);
 
         priorStates.add(state);
 
@@ -247,7 +248,7 @@ public class MLPPlayer implements Player {
 
         int i = 0;
         while (!priorStates.empty()) {
-            GameBoard gb = priorStates.pop();
+            GameBoardShaanan gb = priorStates.pop();
             //System.out.println(gb);
             cur_in = genInput(gb);
 

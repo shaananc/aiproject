@@ -16,7 +16,7 @@ public class NegaScout {
 
     int maxdepth = 6;
     int playerId;
-    Evaluator evaluator;
+    FeatureEvaluator evaluator;
 
     public NegaScout(int playerId, int maxdepth) {
         this.playerId = playerId;
@@ -24,13 +24,13 @@ public class NegaScout {
         this.maxdepth = maxdepth;
     }
 
-    public NegaScout(int playerId,int maxdepth,Evaluator e) {
+    public NegaScout(int playerId,int maxdepth,FeatureEvaluator e) {
         this(playerId, maxdepth);
         evaluator = e;
     }
 
     // TODO - evaluate use of depth.
-    public ScoutRet negascout(GameBoard gb, List<InternalMove> p, double alpha, double beta, int d, int color) {
+    public ScoutRet negascout(GameBoardShaanan gb, List<InternalMove> p, double alpha, double beta, int d, int color) {
         double b, i;
         ScoutRet t;
         ScoutRet a = new ScoutRet();
@@ -91,7 +91,7 @@ public class NegaScout {
 
     }
 
-    public List<InternalMove> chooseMove(GameBoard gb) {
+    public List<InternalMove> chooseMove(GameBoardShaanan gb) {
 
         ScoutRet t = negascout(gb, null, Integer.MIN_VALUE + 1, Integer.MAX_VALUE, 0, (playerId == 1 ? 1 : -1) );
         if (!t.moveList.isEmpty()) {
@@ -110,7 +110,7 @@ public class NegaScout {
 
     public static void playHuman() {
         NegaScout ns = new NegaScout(1,3);
-        GameBoard gb = new GameBoard(5);
+        GameBoardShaanan gb = new GameBoardShaanan(5);
         System.out.println(gb);
 
         Scanner s = new Scanner(System.in);

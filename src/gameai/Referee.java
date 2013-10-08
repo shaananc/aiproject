@@ -22,7 +22,6 @@ public class Referee implements Piece{
 	 */
 	public static void main(String[] args)
 	{
-            
 		lastPlayedMove = new Move();
 		int NumberofMoves = 0;
 		int boardEmptyPieces=Integer.valueOf(args[0])*Integer.valueOf(args[0]);

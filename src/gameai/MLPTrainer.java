@@ -29,7 +29,7 @@ public class MLPTrainer {
         Player MLP2 = (Player) myMLPPlayer2;
         Player NP = (Player) new NegaPlayer();
         Player Random = (Player) new RandomPlayer();
-        Player MitchP = (Player) new Mbrunton();
+        Player MitchP = (Player) new BotPlayer();
         Player Human = (Player) new HumanPlayer();
 
 

@@ -7,6 +7,9 @@ public abstract class MoveFinder implements Piece {
 	int player;
 	int MAX_DEPTH = 6;
 	double[] weights;
+        
+        boolean useQF = false;
+        
 	public static final int TRAINING_SIZE = 2;
 	public static final int INF = Integer.MAX_VALUE / 2;
 	public static final int NUM_FEATURES = 2;

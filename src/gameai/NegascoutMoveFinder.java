@@ -2,7 +2,6 @@ package gameai;
 
 public class NegascoutMoveFinder extends MoveFinder {
 
-    
     public NegascoutMoveFinder(int n, int player) {
         super(n, player);
     }
@@ -14,59 +13,80 @@ public class NegascoutMoveFinder extends MoveFinder {
         int alpha = -INF;
         int beta = INF;
 
-        double bestUtility = negascout(root, alpha, beta, MAX_DEPTH);
-
-        for (Node childNode : root.childNodes) {
-            if (childNode.utility == bestUtility) {
-                return childNode.lastMove;
-            }
-        }
+        ScoutRetMitch ret = negascout(root, alpha, beta, 0);
+        return ret.node.lastMove;
+        
+//        double bestUtility = negascout(root, alpha, beta, MAX_DEPTH);
+//
+//        for (Node childNode : root.childNodes) {
+//            if (childNode.utility == bestUtility) {
+//                return childNode.lastMove;
+//            }
+//        }
 
         // should never get here
-        return null;
+//        System.out.println("FATAL ERROR");
+//        System.exit(1);
+
+//        return null;
     }
 
     public double getTrueUtility(Node node) {
-        return negascout(node, -INF, INF, MAX_DEPTH);
+        return negascout(node, -INF, INF, 0).score;
     }
 
-    public double negascout(Node node, double alpha, double beta, int depth) {
-        if (node.gb.getWinner() != EMPTY || depth <= 0) {
-            
-            if(useQF == true){
-            QuiescFinder qf = new QuiescFinder(n, player);
-            node.utility = qf.Quiesce(alpha, beta, node);}
-            else{
-                node.utility = evaluate(node);
-            }
-            return node.utility;
+    public ScoutRetMitch negascout(Node node, double alpha, double beta, int depth) {
+
+        double b;
+        
+        ScoutRetMitch t;
+        ScoutRetMitch a = new ScoutRetMitch();
+        
+        if (node.gb.getWinner() != EMPTY || depth >= MAX_DEPTH) {
+             
+            return new ScoutRetMitch(evaluate(node),node);
         }
+
+        a.score = alpha;
+        b = beta;
 
         node.getChildNodes();
         boolean isFirst = true;
         for (Node childNode : node.childNodes) {
             // search in null window
-            double score = -negascout(childNode, -alpha - 1, -alpha, depth - 1);
-            if (alpha < score && score < beta && !isFirst) {
+            t = negascout(childNode, -b, -a.score, depth + 1);
+            t.score = -t.score;
+            t.node = childNode;
+            
+            if ((t.score > a.score) && (t.score < beta) && !isFirst && (depth < MAX_DEPTH - 1)) {
                 // initial search failed, continue with regular alpha beta
                 childNode.resetChildren();
-                score = -negascout(childNode, -beta, -alpha, depth - 1);
+                a = negascout(childNode, -beta, -t.score, depth + 1);
+                a.score = -a.score;
+                a.node = childNode;
             }
-            alpha = Math.max(alpha, score);
-            if (alpha >= beta) {
-                break;
+
+            if (t.score > a.score) {
+                a = t;
             }
+
+            if (a.score >= beta) {
+                return a;
+            }
+
+            b = a.score + 1;
+
             isFirst = false;
         }
 
-        node.utility = alpha;
+        
 
         // remove non-essential children to conserve memory
-
+//
         if (depth < MAX_DEPTH) {
             node.resetChildren();
         }
 
-        return node.utility;
+        return a;
     }
 }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public abstract class MoveFinder implements Piece {
 	int n;
 	int player;
-	int MAX_DEPTH = 6;
+	int MAX_DEPTH = 4;
 	double[] weights;
         
         boolean useQF = false;

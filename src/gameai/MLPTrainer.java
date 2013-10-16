@@ -46,8 +46,16 @@ public class MLPTrainer {
                 System.out.println("Versus NegaPlayer: " + w1);
                 System.out.println("Versus MitchPlayer: " + w2);
                 System.out.println("Versus Random: " + w3);
-                
-                if(w1.equals("White") && w2.equals("White")){
+
+                String w4 = playGame(NP, MLP1, true);
+                String w5 = playGame(MitchP, MLP1, true);
+                String w6 = playGame(Random, MLP1, true);
+
+                System.out.println("Versus NegaPlayer: " + w4);
+                System.out.println("Versus MitchPlayer: " + w5);
+                System.out.println("Versus Random: " + w6);
+
+                if (w1.equals("White") && w2.equals("White")) {
                     break;
                 }
 
